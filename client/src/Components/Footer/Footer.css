@@ -1,0 +1,141 @@
+.footer {
+  position: relative;
+  overflow: hidden;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(33, 150, 243, 0.3) 50%, 
+    transparent 100%
+  );
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-link {
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+}
+
+.footer-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: #2196f3;
+  transition: width 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #2196f3 !important;
+  transform: translateX(5px);
+}
+
+.footer-link:hover::after {
+  width: 100%;
+}
+
+.social-icon {
+  transition: all 0.3s ease;
+  margin-right: 0.5rem;
+}
+
+.social-icon:hover {
+  transform: translateY(-3px);
+  color: #2196f3;
+}
+
+.footer-contact {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-contact li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.footer-contact li svg {
+  color: #2196f3;
+  transition: transform 0.3s ease;
+}
+
+.footer-contact li:hover svg {
+  transform: scale(1.2);
+}
+
+/* Animation classes */
+.footer-animate {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .footer {
+    text-align: center;
+  }
+  
+  .footer-contact li {
+    justify-content: center;
+  }
+  
+  .social-icon {
+    margin: 0 0.25rem;
+  }
+}
+
+/* Hover effects for the entire footer */
+.footer:hover .footer-animate {
+  transition: all 0.5s ease;
+}
+
+/* Gradient background animation */
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.footer::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(33, 150, 243, 0.3) 50%, 
+    transparent 100%
+  );
+  animation: gradientBG 3s ease infinite;
+  background-size: 200% 200%;
+} 

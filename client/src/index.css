@@ -1,0 +1,139 @@
+:root {
+  /* Color variables */
+  --color-primary: #FF0000;
+  --color-secondary: #0000FF;
+  --color-tertiary: #FFFF00;
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-gray: #F5F5F5;
+  --color-dark-gray: #333333;
+  
+  /* Spacing variables */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 4rem;
+  
+  /* Animation variables */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  background-color: var(--color-gray);
+  color: var(--color-black);
+  line-height: 1.6;
+}
+
+/* Modern art-inspired geometric elements */
+.geometric-shape {
+  position: absolute;
+  z-index: -1;
+  opacity: 0.1;
+}
+
+.geometric-shape.red {
+  background-color: var(--color-primary);
+}
+
+.geometric-shape.blue {
+  background-color: var(--color-secondary);
+}
+
+.geometric-shape.yellow {
+  background-color: var(--color-tertiary);
+}
+
+/* Asymmetrical grid layout */
+.asymmetrical-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+}
+
+/* Overlapping elements */
+.overlap-container {
+  position: relative;
+  margin: var(--spacing-lg) 0;
+}
+
+.overlap-item {
+  position: relative;
+  z-index: 1;
+  transition: transform var(--transition-medium);
+}
+
+.overlap-item:hover {
+  transform: translateY(-5px);
+  z-index: 2;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.fade-in {
+  animation: fadeIn var(--transition-medium);
+}
+
+.slide-in {
+  animation: slideIn var(--transition-medium);
+}
+
+.rotate {
+  animation: rotate 20s linear infinite;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .asymmetrical-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .asymmetrical-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Accessibility */
+:focus {
+  outline: 3px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --color-primary: #FF0000;
+    --color-secondary: #0000FF;
+    --color-tertiary: #FFFF00;
+    --color-black: #000000;
+    --color-white: #FFFFFF;
+    --color-gray: #FFFFFF;
+    --color-dark-gray: #000000;
+  }
+}

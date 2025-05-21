@@ -1,0 +1,92 @@
+import React from 'react';
+import { 
+  Box, 
+  Typography, 
+  FormControl, 
+  InputLabel, 
+  Select, 
+  MenuItem, 
+  Button,
+  Grid,
+  Paper
+} from '@mui/material';
+import { componentsList } from './componentsList';
+
+const ComponentSelector = ({ 
+  currentComponentType, 
+  setCurrentComponentType, 
+  currentComponent, 
+  setCurrentComponent,
+  handleAddComponent,
+  selectedComponents
+}) => {
+  return (
+    <Paper sx={{ bgcolor: '#1e293b', p: 3, borderRadius: 2, mb: 4 }}>
+      <Typography variant="h6" color="white" fontWeight="bold" gutterBottom>
+        Add Components
+      </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth variant="filled" sx={{ bgcolor: '#374151' }}>
+            <InputLabel sx={{ color: '#ccc' }}>Component Type</InputLabel>
+            <Select
+              value={currentComponentType}
+              onChange={(e) => {
+                setCurrentComponentType(e.target.value);
+                setCurrentComponent("");
+              }}
+              sx={{ color: 'white' }}
+            >
+              <MenuItem value="">
+                <em>Select Component Type</em>
+              </MenuItem>
+              {Object.keys(componentsList).map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type} {selectedComponents[type] ? "✓" : ""}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <FormControl 
+            fullWidth 
+            variant="filled" 
+            sx={{ bgcolor: '#374151' }}
+            disabled={!currentComponentType}
+          >
+            <InputLabel sx={{ color: '#ccc' }}>Component</InputLabel>
+            <Select
+              value={currentComponent}
+              onChange={(e) => setCurrentComponent(e.target.value)}
+              sx={{ color: 'white' }}
+            >
+              <MenuItem value="">
+                <em>Select Component</em>
+              </MenuItem>
+              {currentComponentType &&
+                Object.entries(componentsList[currentComponentType]).map(([component, { price }]) => (
+                  <MenuItem key={component} value={component}>
+                    {component} - ₹{price.toLocaleString()}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+      <Box sx={{ mt: 3 }}>
+        <Button
+          onClick={handleAddComponent}
+          disabled={!currentComponentType || !currentComponent}
+          variant="contained"
+          color="primary"
+          fullWidth
+        >
+          Add Component
+        </Button>
+      </Box>
+    </Paper>
+  );
+};
+
+export default ComponentSelector;
