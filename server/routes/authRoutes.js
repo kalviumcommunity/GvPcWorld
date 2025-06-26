@@ -3,33 +3,52 @@ const router = express.Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const { authenticate } = require('../middleware/authMiddleware');
+const { authenticateToken } = require('../middleware/authMiddleware');
 const User = require('../models/user.js');
 
-// Google OAuth routes
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// Google OAuth routes with debug logging
+router.get('/google', (req, res, next) => {
+  console.log('Initiating Google OAuth flow');
+  passport.authenticate('google', { 
+    scope: ['profile', 'email']
+  })(req, res, next);
+});
 
-router.get('/google/callback', 
-  passport.authenticate('google', { session: false, failureRedirect: '/' }),
-  (req, res) => {
+router.get('/google/callback', (req, res, next) => {
+  console.log('Processing Google OAuth callback');
+  passport.authenticate('google', { 
+    session: false,
+    failureRedirect: '/login?error=auth_failed'
+  }, (err, user) => {
+    if (err) {
+      console.error('Error in Google callback:', err);
+      return res.redirect('/login?error=auth_failed');
+    }
+    if (!user) {
+      console.log('No user found in Google callback');
+      return res.redirect('/login?error=no_user');
+    }
     try {
-      const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign(
+        { id: user._id },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
       
       res.cookie('jwt', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 3600000000, 
+        maxAge: 3600000 // 1 hour in milliseconds
       });
       
-      // Redirect to our home page
-      res.redirect('http://localhost:5173/');
+      res.redirect(process.env.CLIENT_URL || 'http://localhost:5173');
     } catch (error) {
       console.error('Error in Google callback:', error);
-      res.redirect('http://localhost:5173/login?error=auth_failed');
+      res.redirect('/login?error=auth_failed');
     }
-  }
-);
+  })(req, res, next);
+});
 
 router.post('/logout', (req, res) => {
   try {
@@ -47,7 +66,8 @@ router.post('/logout', (req, res) => {
 });
 
 // Check authentication status
-router.get('/success', authenticate, async (req, res) => {
+router.get('/success', authenticateToken, async (req, res) => {
+  console.log('Handling /success route, user:', req.user);
   try {
     const user = await User.findById(req.user.id);
     

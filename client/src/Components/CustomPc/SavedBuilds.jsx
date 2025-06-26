@@ -1,74 +1,140 @@
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Box, Typography, Grid, Paper, Button, Stack } from '@mui/material';
+import { Box, Typography, Grid, Paper, Button, Stack, Chip, Fade, Divider } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import ComputerIcon from '@mui/icons-material/Computer';
 
 const SavedBuilds = ({ builds, onEdit, onDuplicate, onAddToCart }) => {
   return (
-    <Box sx={{ mt: 4 }}>
-      <Typography variant="h4" color="primary" fontWeight="bold" gutterBottom>
+    <Box sx={{ mt: 6 }}>
+      <Typography 
+        variant="h5" 
+        color="primary" 
+        fontWeight="bold" 
+        gutterBottom
+        sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}
+      >
+        <ComputerIcon sx={{ fontSize: 28 }} />
         Your Saved Builds
       </Typography>
-      <Grid container spacing={3}>
-        {builds.map(pc => (
-          <Grid item xs={12} md={6} lg={4} key={pc.id}>
-            <Paper sx={{ bgcolor: '#1e293b', p: 3, borderRadius: 2 }}>              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="h6" color="primary" fontWeight="bold" gutterBottom>
-                  {pc.name}
-                </Typography>
-                {pc.isPreBuilt && (
-                  <Typography 
-                    variant="caption" 
-                    sx={{ 
-                      bgcolor: 'secondary.main', 
-                      px: 1, 
-                      py: 0.5, 
-                      borderRadius: 1,
-                      color: 'white'
-                    }}
-                  >
-                    Pre-Built
-                  </Typography>
-                )}
-              </Box>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {Object.keys(pc.components).length} components
-              </Typography>
-              <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
-                Created {formatDistanceToNow(new Date(pc.createdAt), { addSuffix: true })}
-              </Typography>
-              <Typography variant="h6" color="white" fontWeight="bold" gutterBottom>
-                ₹{pc.totalPrice.toLocaleString()}
-              </Typography>
-              <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-                <Button
-                  onClick={() => onEdit(pc)}
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                >
-                  Edit
-                </Button>
-                <Button
-                  onClick={() => onDuplicate(pc)}
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                >
-                  Duplicate
-                </Button>
-                <Button
-                  onClick={() => onAddToCart(pc)}
-                  variant="contained"
-                  color="success"
-                  size="small"
-                >
-                  Add to Cart
-                </Button>
-              </Stack>
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
+      
+      <Box sx={{
+        maxHeight: { xs: '400px', sm: '600px' },
+        overflowY: 'auto',
+        pr: 1,
+        mx: -1,
+        scrollbarWidth: 'thin',
+        '&::-webkit-scrollbar': {
+          width: 8,
+          background: 'rgba(0,0,0,0.04)',
+          borderRadius: 8,
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: 'rgba(0,0,0,0.10)',
+          borderRadius: 8,
+        },
+      }}>
+        <Grid container spacing={3}>
+          {builds.map((pc, index) => (
+            <Grid item xs={12} md={6} lg={4} key={pc.id}>
+              <Fade in timeout={400 + index * 100}>
+                <Paper sx={{
+                  bgcolor: 'background.default',
+                  p: 3,
+                  borderRadius: 3,
+                  height: '100%',
+                  boxShadow: '0 2px 12px 0 rgba(0,0,0,0.08)',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
+                  },
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+                    <Box>
+                      <Typography variant="h6" color="text.primary" fontWeight="bold" gutterBottom>
+                        {pc.name}
+                      </Typography>
+                      {pc.isPreBuilt && (
+                        <Chip
+                          label="Pre-Built"
+                          color="secondary"
+                          size="small"
+                          sx={{ mb: 1 }}
+                        />
+                      )}
+                    </Box>
+                    <Typography variant="h5" color="primary" fontWeight="bold">
+                      ₹{pc.totalPrice.toLocaleString()}
+                    </Typography>
+                  </Box>
+
+                  <Stack spacing={1} sx={{ mb: 3 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {Object.keys(pc.components).length} components selected
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Created {formatDistanceToNow(new Date(pc.createdAt), { addSuffix: true })}
+                    </Typography>
+                  </Stack>
+
+                  <Divider sx={{ mb: 2 }} />
+
+                  <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                    <Button
+                      onClick={() => onEdit(pc)}
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      startIcon={<EditIcon />}
+                      sx={{ 
+                        flex: 1,
+                        borderRadius: 2,
+                        fontWeight: 600,
+                        textTransform: 'none'
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      onClick={() => onDuplicate(pc)}
+                      variant="outlined"
+                      color="secondary"
+                      size="small"
+                      startIcon={<ContentCopyIcon />}
+                      sx={{ 
+                        flex: 1,
+                        borderRadius: 2,
+                        fontWeight: 600,
+                        textTransform: 'none'
+                      }}
+                    >
+                      Copy
+                    </Button>
+                    <Button
+                      onClick={() => onAddToCart(pc)}
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      startIcon={<AddShoppingCartIcon />}
+                      sx={{ 
+                        flex: 1,
+                        borderRadius: 2,
+                        fontWeight: 600,
+                        textTransform: 'none'
+                      }}
+                    >
+                      Cart
+                    </Button>
+                  </Stack>
+                </Paper>
+              </Fade>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
     </Box>
   );
 };

@@ -1,13 +1,20 @@
 // Home.js
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo, lazy, Suspense } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import { Box, Button, Container, Typography, Grid, Card, CardContent, CardMedia, useTheme, useMediaQuery } from "@mui/material";
-import ProductCard from "../Components/ProductCard/ProductCard";
+import { Box, Button, Container, Typography, Grid, Card, CardContent, CardMedia, useTheme, useMediaQuery, Fade, Slide } from "@mui/material";
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lottie from 'lottie-react';
 import computerAnimation from '../assets/animations/computer-build.json';
+import KeyboardIcon from '@mui/icons-material/Keyboard';
+import MouseIcon from '@mui/icons-material/Mouse';
+import ComputerIcon from '@mui/icons-material/Computer';
+import StorageIcon from '@mui/icons-material/Storage';
+import MemoryIcon from '@mui/icons-material/Memory';
+import DeveloperBoardIcon from '@mui/icons-material/DeveloperBoard';
 import './Home.css';
+
+const ProductCard = lazy(() => import("../Components/ProductCard/ProductCard"));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,8 +26,17 @@ const Home = () => {
   const categoriesRef = useRef(null);
   const testimonialsRef = useRef(null);
 
-  // Featured categories data
-  const categories = [
+  // Memoize navigation handlers
+  const handleStartBuilding = React.useCallback(() => {
+    navigate('/custom-pc');
+  }, [navigate]);
+
+  const handleBrowseProducts = React.useCallback(() => {
+    navigate('/products/components');
+  }, [navigate]);
+
+  // Memoize categories data
+  const categories = React.useMemo(() => [
     {
       id: 1,
       title: 'CPUs',
@@ -63,10 +79,10 @@ const Home = () => {
       description: 'Stylish cases to showcase your build',
       path: '/products/case'
     }
-  ];
+  ], []);
 
-  // Testimonials data
-  const testimonials = [
+  // Memoize testimonials data
+  const testimonials = React.useMemo(() => [
     {
       id: 1,
       name: 'Alex Johnson',
@@ -88,415 +104,610 @@ const Home = () => {
       image: '/images/testimonials/user3.jpg',
       text: 'Fast shipping and excellent customer service. My development workstation is running perfectly!'
     }
-  ];
+  ], []);
 
-  useEffect(() => {
-    // Hero section animations
-    const hero = heroRef.current;
-    const heroTitle = hero.querySelector('.hero-title');
-    const heroSubtitle = hero.querySelector('.hero-subtitle');
-    const heroButtons = hero.querySelector('.hero-buttons');
-    const heroAnimation = hero.querySelector('.hero-animation');
+  // Optimize animations with useCallback
+  const initializeAnimations = React.useCallback(() => {
+    let animations = [];
 
-    gsap.fromTo(
-      heroTitle,
-      { y: 50, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, delay: 0.2 }
-    );
+    const animateHeroElements = () => {
+      const hero = heroRef.current;
+      if (!hero) return;
 
-    gsap.fromTo(
-      heroSubtitle,
-      { y: 30, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, delay: 0.4 }
-    );
+      const heroElements = [
+        { el: hero.querySelector('.hero-title'), delay: 0.2 },
+        { el: hero.querySelector('.hero-subtitle'), delay: 0.4 },
+        { el: hero.querySelector('.hero-buttons'), delay: 0.6 },
+        { el: hero.querySelector('.hero-animation'), delay: 0.3 }
+      ];
 
-    gsap.fromTo(
-      heroButtons,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, delay: 0.6 }
-    );
-
-    gsap.fromTo(
-      heroAnimation,
-      { scale: 0.8, opacity: 0 },
-      { scale: 1, opacity: 1, duration: 1, delay: 0.3 }
-    );
-
-    // Categories section animations
-    const categories = categoriesRef.current;
-    const categoryCards = categories.querySelectorAll('.category-card');
-
-    gsap.fromTo(
-      categoryCards,
-      { y: 50, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.6,
-        stagger: 0.1,
-        scrollTrigger: {
-          trigger: categories,
-          start: 'top center+=100',
-          toggleActions: 'play none none reverse'
+      heroElements.forEach(({ el, delay }) => {
+        if (el) {
+          animations.push(
+            gsap.fromTo(
+              el,
+              { y: 30, opacity: 0 },
+              { 
+                y: 0, 
+                opacity: 1, 
+                duration: 0.8, 
+                delay,
+                ease: 'power2.out'
+              }
+            )
+          );
         }
-      }
-    );
+      });
+    };
 
-    // Testimonials section animations
-    const testimonials = testimonialsRef.current;
-    const testimonialCards = testimonials.querySelectorAll('.testimonial-card');
+    const animateCategories = () => {
+      const categories = categoriesRef.current;
+      if (!categories) return;
 
-    gsap.fromTo(
-      testimonialCards,
-      { x: isMobile ? 0 : 50, y: isMobile ? 50 : 0, opacity: 0 },
-      {
-        x: 0,
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.2,
-        scrollTrigger: {
-          trigger: testimonials,
-          start: 'top center+=100',
-          toggleActions: 'play none none reverse'
-        }
+      const categoryCards = categories.querySelectorAll('.category-card');
+      if (categoryCards.length) {
+        animations.push(
+          gsap.fromTo(
+            categoryCards,
+            { y: 50, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.6,
+              stagger: 0.1,
+              scrollTrigger: {
+                trigger: categories,
+                start: 'top center+=100',
+                toggleActions: 'play none none none'
+              }
+            }
+          )
+        );
       }
-    );
+    };
+
+    const animateTestimonials = () => {
+      const testimonials = testimonialsRef.current;
+      if (!testimonials) return;
+
+      const testimonialCards = testimonials.querySelectorAll('.testimonial-card');
+      if (testimonialCards.length) {
+        animations.push(
+          gsap.fromTo(
+            testimonialCards,
+            { y: 30, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.6,
+              stagger: 0.15,
+              scrollTrigger: {
+                trigger: testimonials,
+                start: 'top center+=100',
+                toggleActions: 'play none none none'
+              }
+            }
+          )
+        );
+      }
+    };
+
+    // Execute animations in order
+    animateHeroElements();
+    animateCategories();
+    animateTestimonials();
 
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      animations.forEach(anim => {
+        if (anim.kill) anim.kill();
+      });
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.kill) trigger.kill();
+      });
     };
-  }, [isMobile]);
+  }, []);
 
-  const handleStartBuilding = () => {
-    navigate('/custom-pc');
-  };
+  // Run animations only once on mount
+  useEffect(() => {
+    const cleanup = initializeAnimations();
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [initializeAnimations]);
 
-  const handleBrowseProducts = () => {
-    navigate('/products/components');
-  };
+  // Memoize CategoryCard component
+  const CategoryCard = React.memo(({ category, index, onNavigate }) => (
+    <Fade in timeout={600} style={{ transitionDelay: `${index * 100}ms` }}>
+      <Card 
+        className="category-card"
+        onClick={() => onNavigate(category.path)}
+        sx={{ 
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          background: 'rgba(255,255,255,0.05)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: 4,
+          cursor: 'pointer',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-8px)',
+            boxShadow: '0 12px 30px 0 rgba(0,0,0,0.2)',
+            '& .category-image': {
+              transform: 'scale(1.05)'
+            }
+          }
+        }}
+      >
+        <Box sx={{ position: 'relative', overflow: 'hidden', pt: '60%' }}>
+          <CardMedia
+            component="img"
+            image={category.image}
+            alt={category.title}
+            className="category-image"
+            sx={{ 
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              transition: 'transform 0.6s ease'
+            }}
+          />
+          <Box sx={{ 
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
+            pt: 6,
+            pb: 2,
+            px: 2
+          }}>
+            <Typography variant="h5" sx={{ color: 'white', fontWeight: 600 }}>
+              {category.title}
+            </Typography>
+          </Box>
+        </Box>
+        <CardContent sx={{ flexGrow: 1, bgcolor: 'transparent' }}>
+          <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+            {category.description}
+          </Typography>
+        </CardContent>
+      </Card>
+    </Fade>
+  ), (prevProps, nextProps) => {
+    return (
+      prevProps.category === nextProps.category &&
+      prevProps.index === nextProps.index
+    );
+  });
 
-  return (
-    <Box className="home-page">
-      <Container sx={{ pt: 4 }}>
-        <Box
-          sx={{
-            textAlign: "center",
-            padding: "2rem",
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
-            borderRadius: "10px",
-            marginBottom: "2rem",
+  // Memoize TestimonialCard component
+  const TestimonialCard = React.memo(({ testimonial, index }) => (
+    <Fade in timeout={600} style={{ transitionDelay: `${index * 200}ms` }}>
+      <Card className="testimonial-card" sx={{ 
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        p: 3,
+        borderRadius: 4,
+        background: 'rgba(255,255,255,0.05)',
+        backdropFilter: 'blur(10px)',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-5px)',
+          boxShadow: '0 12px 30px 0 rgba(0,0,0,0.2)'
+        }
+      }}
+      >
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          mb: 3,
+          pb: 2,
+          borderBottom: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <Box
+            component="img"
+            src={testimonial.image}
+            alt={testimonial.name}
+            sx={{ 
+              width: 64,
+              height: 64,
+              borderRadius: '50%',
+              mr: 2,
+              objectFit: 'cover',
+              border: '3px solid rgba(255,255,255,0.2)'
+            }}
+          />
+          <Box>
+            <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+              {testimonial.name}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+              {testimonial.role}
+            </Typography>
+          </Box>
+        </Box>
+        <Typography 
+          variant="body1" 
+          sx={{ 
+            flexGrow: 1,
+            color: 'rgba(255,255,255,0.9)',
+            fontStyle: 'italic',
+            lineHeight: 1.6
           }}
         >
-          <Typography
-            variant="h3"
-            sx={{ fontWeight: "bold", mb: 2, color: "#00E5FF" }}
-          >
-            Build Your Dream PC
-          </Typography>
-          <Typography variant="subtitle1" sx={{ color: "#E0E0E0" }}>
-            Customize and pick parts for the ultimate performance and design!
-          </Typography>
-        </Box>
+          "{testimonial.text}"
+        </Typography>
+      </Card>
+    </Fade>
+  ), (prevProps, nextProps) => {
+    return (
+      prevProps.testimonial === nextProps.testimonial &&
+      prevProps.index === nextProps.index
+    );
+  });
 
-        <Box
-          display="flex"
-          flexWrap="wrap"
-          justifyContent="space-around"
-          my={4}
-        >
-          <ProductCard
-            title="Gaming PC"
-            description="High-performance gaming rigs"
-            image="/images/products/gaming-pc.jpg"
-            price={1499}
-          />
-          <ProductCard
-            title="Workstation"
-            description="Professional workstations"
-            image="/images/products/workstation.jpg"
-            price={1999}
-          />
-            <ProductCard
-            title="Custom Build"
-            description="Build your dream PC"
-            image="/images/products/custom-pc.jpg"
-            price={1299}
-          />
-        </Box>
-
-        <Box display="flex" justifyContent="center" my={4}>
-          <Button
-            variant="contained"
-            component={Link}
-            to="/custom-pc"
-            sx={{
-              background: "linear-gradient(45deg, #ff4081, #ff80ab)",
-              color: "#fff",
-              fontWeight: "bold",
-              padding: "0.8rem 2rem",
-              fontSize: "1rem",
-              "&:hover": {
-                background: "linear-gradient(45deg, #f50057, #ff4081)",
-              },
-            }}
-          >
-            Customize Your PC
-          </Button>
-        </Box>
-      </Container>
-
-      {/* Hero Section */}
+  return (
+    <Box className="home-page" sx={{ 
+      background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)',
+      color: 'white',
+      minHeight: '100vh',
+      overflow: 'hidden'
+    }}>
+      {/* Hero Section - Modern and Dynamic */}
       <Box 
         ref={heroRef}
         className="hero-section"
         sx={{
-          minHeight: '80vh',
+          minHeight: '90vh',
           display: 'flex',
           alignItems: 'center',
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
           position: 'relative',
-          overflow: 'hidden'
+          background: 'radial-gradient(circle at 50% 50%, rgba(25,118,210,0.1) 0%, rgba(13,71,161,0.2) 100%)',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'url("/images/circuit-pattern.svg")',
+            opacity: 0.1,
+            zIndex: 0
+          }
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={6}>
-              <Typography 
-                variant="h1" 
-                className="hero-title"
-                sx={{ 
-                  fontWeight: 700,
-                  mb: 2,
-                  background: 'linear-gradient(45deg, #2196f3, #1976d2)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent'
-                }}
-              >
-                Build Your Dream PC Today
-              </Typography>
-              <Typography 
-                variant="h5" 
-                className="hero-subtitle"
-                color="text.secondary"
-                sx={{ mb: 4 }}
-              >
-                Customize every component to create the perfect PC for gaming, work, or content creation.
-              </Typography>
-              <Box className="hero-buttons" sx={{ display: 'flex', gap: 2 }}>
-                <Button 
-                  variant="contained" 
-                  size="large"
-                  onClick={handleStartBuilding}
-                  sx={{ 
-                    py: 1.5,
-                    px: 3,
-                    borderRadius: 2,
-                    boxShadow: '0 4px 14px 0 rgba(33, 150, 243, 0.39)',
-                    '&:hover': {
-                      boxShadow: '0 6px 20px 0 rgba(33, 150, 243, 0.5)',
-                    }
-                  }}
-                >
-                  Start Building
-                </Button>
-                <Button 
-                  variant="outlined" 
-                  size="large"
-                  onClick={handleBrowseProducts}
-                  sx={{ 
-                    py: 1.5,
-                    px: 3,
-                    borderRadius: 2
-                  }}
-                >
-                  Browse Products
-                </Button>
-              </Box>
+              <Fade in timeout={1000}>
+                <Box>
+                  <Typography 
+                    variant="h1" 
+                    className="hero-title"
+                    sx={{ 
+                      fontWeight: 800,
+                      mb: 2,
+                      fontSize: { xs: '2.5rem', md: '3.5rem' },
+                      background: 'linear-gradient(45deg, #64b5f6, #2196f3)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      textShadow: '0 2px 10px rgba(33,150,243,0.3)'
+                    }}
+                  >
+                    Craft Your Perfect PC
+                  </Typography>
+                  <Typography 
+                    variant="h5" 
+                    className="hero-subtitle"
+                    sx={{ 
+                      mb: 4,
+                      color: 'rgba(255,255,255,0.9)',
+                      lineHeight: 1.6
+                    }}
+                  >
+                    Experience the ultimate in custom PC building. Choose from premium components and create a machine that's uniquely yours.
+                  </Typography>
+                  <Box className="hero-buttons" sx={{ 
+                    display: 'flex', 
+                    gap: 2,
+                    flexWrap: 'wrap'
+                  }}>
+                    <Button 
+                      variant="contained" 
+                      size="large"
+                      onClick={handleStartBuilding}
+                      sx={{ 
+                        py: 2,
+                        px: 4,
+                        borderRadius: 3,
+                        background: 'linear-gradient(45deg, #2196f3, #1976d2)',
+                        boxShadow: '0 4px 20px 0 rgba(33,150,243,0.4)',
+                        textTransform: 'none',
+                        fontSize: '1.1rem',
+                        fontWeight: 600,
+                        '&:hover': {
+                          background: 'linear-gradient(45deg, #1976d2, #1565c0)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 6px 25px 0 rgba(33,150,243,0.5)',
+                        },
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      Start Building
+                    </Button>
+                    <Button 
+                      variant="outlined" 
+                      size="large"
+                      onClick={handleBrowseProducts}
+                      sx={{ 
+                        py: 2,
+                        px: 4,
+                        borderRadius: 3,
+                        borderWidth: '2px',
+                        borderColor: 'rgba(255,255,255,0.5)',
+                        color: 'white',
+                        textTransform: 'none',
+                        fontSize: '1.1rem',
+                        fontWeight: 600,
+                        '&:hover': {
+                          borderColor: 'white',
+                          backgroundColor: 'rgba(255,255,255,0.05)',
+                          transform: 'translateY(-2px)'
+                        },
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      Browse Products
+                    </Button>
+                  </Box>
+                </Box>
+              </Fade>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Box className="hero-animation" sx={{ width: '100%', height: '100%' }}>
-                <Lottie 
-                  animationData={computerAnimation} 
-                  loop={true}
-                  style={{ width: '100%', height: '100%' }}
-                />
-              </Box>
+              <Slide direction="left" in timeout={1000}>
+                <Box className="hero-animation" sx={{ 
+                  width: '100%', 
+                  height: '100%',
+                  filter: 'drop-shadow(0 0 30px rgba(33,150,243,0.3))'
+                }}>
+                  <Lottie 
+                    animationData={computerAnimation} 
+                    loop={true}
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                </Box>
+              </Slide>
             </Grid>
           </Grid>
         </Container>
-        <div className="particles-container" id="particles-js"></div>
       </Box>
 
-      {/* Featured Categories Section */}
+      {/* Featured Products Section - Card Grid */}
+      <Container sx={{ py: 8 }}>
+        <Typography 
+          variant="h3" 
+          align="center" 
+          sx={{ 
+            mb: 6,
+            fontWeight: 700,
+            background: 'linear-gradient(45deg, #64b5f6, #2196f3)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}
+        >
+          Featured Products
+        </Typography>
+        <Suspense fallback={<Box sx={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</Box>}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(3, 1fr)'
+              },
+              gap: 4
+            }}
+          >
+            <Fade in timeout={600}>
+              <Box>
+                <ProductCard
+                  title="Gaming PC"
+                  description="High-performance gaming rigs"
+                  image="/images/products/gaming-pc.jpg"
+                  price={1499}
+                />
+              </Box>
+            </Fade>
+            <Fade in timeout={600} style={{ transitionDelay: '200ms' }}>
+              <Box>
+                <ProductCard
+                  title="Workstation"
+                  description="Professional workstations"
+                  image="/images/products/workstation.jpg"
+                  price={1999}
+                />
+              </Box>
+            </Fade>
+            <Fade in timeout={600} style={{ transitionDelay: '400ms' }}>
+              <Box>
+                <ProductCard
+                  title="Custom Build"
+                  description="Build your dream PC"
+                  image="/images/products/custom-pc.jpg"
+                  price={1299}
+                />
+              </Box>
+            </Fade>
+          </Box>
+        </Suspense>
+      </Container>
+
+      {/* Categories Section - Modern Grid */}
       <Box 
         ref={categoriesRef}
         className="categories-section"
-        sx={{ py: 8, bgcolor: 'background.default' }}
+        sx={{ 
+          py: 8, 
+          background: 'linear-gradient(135deg, rgba(25,118,210,0.1) 0%, rgba(13,71,161,0.2) 100%)'
+        }}
       >
         <Container maxWidth="lg">
           <Typography 
-            variant="h2" 
+            variant="h3" 
             align="center" 
-            gutterBottom
-            sx={{ mb: 6, fontWeight: 600 }}
+            sx={{ 
+              mb: 6,
+              fontWeight: 700,
+              background: 'linear-gradient(45deg, #64b5f6, #2196f3)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
           >
             Featured Categories
           </Typography>
-          <Grid container spacing={4}>
-            {categories.map((category) => (
+          <Grid container spacing={3}>
+            {categories.map((category, index) => (
               <Grid item xs={12} sm={6} md={4} key={category.id}>
-                <Card 
-                  className="category-card"
-                  sx={{ 
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'transform 0.3s ease-in-out',
-                    '&:hover': {
-                      transform: 'translateY(-10px)',
-                    }
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={category.image}
-                    alt={category.title}
-                    sx={{ objectFit: 'cover' }}
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      {category.title}
-                    </Typography>
-                    <Typography color="text.secondary">
-                      {category.description}
-                    </Typography>
-                  </CardContent>
-                  <Box sx={{ p: 2, pt: 0 }}>
-                    <Button 
-                      variant="text" 
-                      color="primary"
-                      onClick={() => navigate(category.path)}
-                    >
-                      Explore {category.title}
-                    </Button>
-                  </Box>
-                </Card>
+                <CategoryCard 
+                  category={category} 
+                  index={index} 
+                  onNavigate={navigate}
+                />
               </Grid>
             ))}
           </Grid>
         </Container>
       </Box>
 
-      {/* Testimonials Section */}
+      {/* Testimonials Section - Modern Cards */}
       <Box 
         ref={testimonialsRef}
         className="testimonials-section"
         sx={{ 
-          py: 8, 
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+          py: 8,
           position: 'relative',
-          overflow: 'hidden'
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'radial-gradient(circle at 50% 50%, rgba(25,118,210,0.1) 0%, rgba(13,71,161,0.2) 100%)',
+            zIndex: 0
+          }
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
           <Typography 
-            variant="h2" 
+            variant="h3" 
             align="center" 
-            gutterBottom
-            sx={{ mb: 6, fontWeight: 600 }}
+            sx={{ 
+              mb: 6,
+              fontWeight: 700,
+              background: 'linear-gradient(45deg, #64b5f6, #2196f3)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
           >
             What Our Customers Say
           </Typography>
           <Grid container spacing={4}>
-            {testimonials.map((testimonial) => (
+            {testimonials.map((testimonial, index) => (
               <Grid item xs={12} md={4} key={testimonial.id}>
-                <Card 
-                  className="testimonial-card"
-                  sx={{ 
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    p: 3,
-                    borderRadius: 4,
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-                    transition: 'transform 0.3s ease-in-out',
-                    '&:hover': {
-                      transform: 'translateY(-5px)',
-                    }
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Box
-                      component="img"
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      sx={{ 
-                        width: 60, 
-                        height: 60, 
-                        borderRadius: '50%',
-                        mr: 2,
-                        objectFit: 'cover'
-                      }}
-                    />
-                    <Box>
-                      <Typography variant="h6" component="div">
-                        {testimonial.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {testimonial.role}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Typography variant="body1" sx={{ flexGrow: 1 }}>
-                    "{testimonial.text}"
-                  </Typography>
-                </Card>
+                <TestimonialCard 
+                  testimonial={testimonial} 
+                  index={index}
+                />
               </Grid>
             ))}
           </Grid>
         </Container>
       </Box>
 
-      {/* CTA Section */}
+      {/* CTA Section - Modern and Engaging */}
       <Box 
         className="cta-section"
         sx={{ 
-          py: 8, 
+          py: 10,
           textAlign: 'center',
-          background: 'linear-gradient(45deg, #2196f3, #1976d2)',
-          color: 'white'
+          background: 'linear-gradient(45deg, #1976d2, #2196f3)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'url("/images/circuit-pattern.svg")',
+            opacity: 0.1,
+            zIndex: 0
+          }
         }}
       >
-        <Container maxWidth="md">
-          <Typography variant="h3" gutterBottom sx={{ fontWeight: 600 }}>
-            Ready to Build Your Dream PC?
-          </Typography>
-          <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
-            Start your custom PC build today and get expert guidance every step of the way.
-          </Typography>
-          <Button 
-            variant="contained" 
-            size="large"
-            onClick={handleStartBuilding}
-            sx={{ 
-              py: 1.5,
-              px: 4,
-              borderRadius: 2,
-              bgcolor: 'white',
-              color: 'primary.main',
-              '&:hover': {
-                bgcolor: 'rgba(255, 255, 255, 0.9)',
-              }
-            }}
-          >
-            Start Building Now
-          </Button>
+        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
+          <Fade in timeout={800}>
+            <Box>
+              <Typography 
+                variant="h2" 
+                sx={{ 
+                  fontWeight: 800,
+                  mb: 3,
+                  textShadow: '0 2px 10px rgba(0,0,0,0.2)'
+                }}
+              >
+                Ready to Build Your Dream PC?
+              </Typography>
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  mb: 5,
+                  opacity: 0.9,
+                  maxWidth: '800px',
+                  margin: '0 auto',
+                  lineHeight: 1.6
+                }}
+              >
+                Start your custom PC build today and get expert guidance every step of the way.
+              </Typography>
+              <Button 
+                variant="contained" 
+                size="large"
+                onClick={handleStartBuilding}
+                sx={{ 
+                  py: 2,
+                  px: 6,
+                  borderRadius: 3,
+                  bgcolor: 'white',
+                  color: 'primary.main',
+                  fontSize: '1.2rem',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.1)',
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.9)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 6px 25px 0 rgba(0,0,0,0.15)'
+                  },
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                Start Building Now
+              </Button>
+            </Box>
+          </Fade>
         </Container>
       </Box>
     </Box>
   );
 };
 
-export default Home;
+export default memo(Home);

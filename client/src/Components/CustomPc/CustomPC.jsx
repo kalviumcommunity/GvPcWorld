@@ -136,52 +136,68 @@ const CustomPC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 4 } }}>
-      <Paper elevation={3} sx={{ 
-        bgcolor: '#1e293b', 
-        p: { xs: 2, sm: 3, md: 4 }, 
-        borderRadius: 2,
-        overflow: 'hidden'
+    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 4 }, minHeight: '100vh' }}>
+      <Paper elevation={6} sx={{
+        bgcolor: 'background.paper',
+        p: { xs: 1.5, sm: 3, md: 5 },
+        borderRadius: 4,
+        boxShadow: '0 4px 32px 0 rgba(0,0,0,0.10)',
+        overflow: 'hidden',
+        minHeight: '80vh',
+        transition: 'box-shadow 0.3s',
       }}>
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: { xs: 'column', sm: 'row' }, 
+        <Box sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between',
           alignItems: { xs: 'stretch', sm: 'center' },
           mb: 3,
-          gap: { xs: 2, sm: 0 }
+          gap: { xs: 2, sm: 0 },
         }}>
           <TextField
             value={currentBuildName}
             onChange={(e) => setCurrentBuildName(e.target.value)}
             variant="outlined"
             size="small"
-            sx={{ 
-              minWidth: { xs: '100%', sm: '200px' },
+            placeholder="Build Name"
+            sx={{
+              minWidth: { xs: '100%', sm: 220 },
+              bgcolor: 'background.default',
+              borderRadius: 2,
               '& .MuiOutlinedInput-root': {
-                color: 'white',
+                color: 'text.primary',
+                borderRadius: 2,
+                background: 'rgba(255,255,255,0.04)',
+                boxShadow: '0 1px 4px 0 rgba(0,0,0,0.04)',
                 '& fieldset': {
-                  borderColor: 'rgba(255, 255, 255, 0.23)',
+                  borderColor: 'divider',
                 },
                 '&:hover fieldset': {
                   borderColor: 'primary.main',
                 },
-              }
+              },
             }}
           />
-          <Box sx={{ 
-            display: 'flex', 
+          <Box sx={{
+            display: 'flex',
             gap: 2,
-            flexDirection: { xs: 'column', sm: 'row' } 
+            flexDirection: { xs: 'column', sm: 'row' },
+            width: { xs: '100%', sm: 'auto' },
           }}>
             <Button
               variant="contained"
               color="primary"
               onClick={handleAddToCart}
               disabled={!isPCComplete}
-              fullWidth={false}
-              sx={{ 
-                minWidth: { xs: '100%', sm: 'auto' }
+              fullWidth
+              sx={{
+                borderRadius: 2,
+                fontWeight: 600,
+                boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)',
+                letterSpacing: 1,
+                py: 1.2,
+                fontSize: { xs: 16, sm: 16 },
+                transition: 'background 0.2s',
               }}
             >
               Add to Cart
@@ -190,9 +206,14 @@ const CustomPC = () => {
               variant="outlined"
               color="error"
               onClick={handleReset}
-              fullWidth={false}
-              sx={{ 
-                minWidth: { xs: '100%', sm: 'auto' }
+              fullWidth
+              sx={{
+                borderRadius: 2,
+                fontWeight: 600,
+                py: 1.2,
+                fontSize: { xs: 16, sm: 16 },
+                borderWidth: 2,
+                transition: 'border 0.2s',
               }}
             >
               Reset Build
@@ -200,27 +221,45 @@ const CustomPC = () => {
           </Box>
         </Box>
 
-        <ProgressBar components={selectedComponents} />
-        <ComponentSelector
-          componentType={currentComponentType}
-          component={currentComponent}
-          onComponentTypeChange={setCurrentComponentType}
-          onComponentChange={setCurrentComponent}
-          onAdd={handleAddComponent}
-          selectedComponents={selectedComponents}
-        />
-
-        <Box sx={{ 
-          display: 'grid',
-          gridTemplateColumns: { 
-            xs: '1fr',
-            sm: 'repeat(2, 1fr)',
-            md: 'repeat(3, 1fr)',
-            lg: 'repeat(4, 1fr)' 
-          },
-          gap: { xs: 2, sm: 3 },
-          mt: 4 
-        }}>
+        <Box sx={{ mb: 3 }}>
+          <ProgressBar components={selectedComponents} />
+        </Box>
+        <Box sx={{ mb: 3 }}>
+          <ComponentSelector
+            componentType={currentComponentType}
+            component={currentComponent}
+            onComponentTypeChange={setCurrentComponentType}
+            onComponentChange={setCurrentComponent}
+            onAdd={handleAddComponent}
+            selectedComponents={selectedComponents}
+          />
+        </Box>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: 'repeat(2, 1fr)',
+              md: 'repeat(3, 1fr)',
+              lg: 'repeat(4, 1fr)',
+            },
+            gap: { xs: 2, sm: 3 },
+            mt: 2,
+            maxHeight: { xs: 400, sm: 500 },
+            overflowY: 'auto',
+            pr: 1,
+            scrollbarWidth: 'thin',
+            '&::-webkit-scrollbar': {
+              width: 8,
+              background: 'rgba(0,0,0,0.04)',
+              borderRadius: 8,
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: 'rgba(0,0,0,0.10)',
+              borderRadius: 8,
+            },
+          }}
+        >
           {Object.entries(componentsList).map(([type]) => (
             <ComponentCard
               key={type}
@@ -230,13 +269,14 @@ const CustomPC = () => {
             />
           ))}
         </Box>
-
-        <SavedBuilds
-          builds={customPCs}
-          onEdit={handleEditPC}
-          onDuplicate={handleDuplicatePC}
-          onAddToCart={handleAddToCart}
-        />
+        <Box sx={{ mt: 4 }}>
+          <SavedBuilds
+            builds={customPCs}
+            onEdit={handleEditPC}
+            onDuplicate={handleDuplicatePC}
+            onAddToCart={handleAddToCart}
+          />
+        </Box>
       </Paper>
     </Container>
   );

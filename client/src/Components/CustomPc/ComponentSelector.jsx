@@ -11,7 +11,6 @@ import {
   Paper
 } from '@mui/material';
 import { componentsList } from './componentsList';
-
 const ComponentSelector = ({ 
   currentComponentType, 
   setCurrentComponentType, 
@@ -21,7 +20,14 @@ const ComponentSelector = ({
   selectedComponents
 }) => {
   return (
-    <Paper sx={{ bgcolor: '#1e293b', p: 3, borderRadius: 2, mb: 4 }}>
+    <Paper elevation={2} sx={{
+      p: { xs: 2, sm: 3 },
+      borderRadius: 3,
+      boxShadow: '0 2px 12px 0 rgba(0,0,0,0.07)',
+      mb: 2,
+      bgcolor: 'background.default',
+      transition: 'box-shadow 0.2s',
+    }}>
       <Typography variant="h6" color="white" fontWeight="bold" gutterBottom>
         Add Components
       </Typography>
@@ -35,7 +41,7 @@ const ComponentSelector = ({
                 setCurrentComponentType(e.target.value);
                 setCurrentComponent("");
               }}
-              sx={{ color: 'white' }}
+              sx={{ color: 'white', borderRadius: 2 }}
             >
               <MenuItem value="">
                 <em>Select Component Type</em>
@@ -59,7 +65,7 @@ const ComponentSelector = ({
             <Select
               value={currentComponent}
               onChange={(e) => setCurrentComponent(e.target.value)}
-              sx={{ color: 'white' }}
+              sx={{ color: 'white', borderRadius: 2 }}
             >
               <MenuItem value="">
                 <em>Select Component</em>
@@ -81,6 +87,7 @@ const ComponentSelector = ({
           variant="contained"
           color="primary"
           fullWidth
+          sx={{ borderRadius: 2, fontWeight: 600, px: 3, py: 1.2 }}
         >
           Add Component
         </Button>
