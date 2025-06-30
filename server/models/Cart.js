@@ -1,68 +1,46 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const cartItemSchema = new mongoose.Schema({
   type: {
     type: String,
+    enum: ['customBuild', 'prebuilt'],
     required: true,
-    enum: ['product', 'customBuild']
-  },
-  productId: {
-    type: String
-  },
-  name: {
-    type: String
-  },
-  price: {
-    type: Number
-  },
-  image: {
-    type: String
   },
   buildName: {
-    type: String
+    type: String,
+    required: true,
   },
   components: {
-    type: Object
+    type: Object,
   },
   totalPrice: {
-    type: Number
+    type: Number,
+    required: true,
   },
   quantity: {
     type: Number,
     required: true,
     min: 1,
-    default: 1
+    default: 1,
   },
-  description: {
-    type: String
-  }
-}, { _id: false })
+}, { _id: false });
 
 const cartSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
   },
   items: [cartItemSchema],
   totalAmount: {
     type: Number,
-    required: true,
-    default: 0
-  }
-}, {
-  timestamps: true
-})
+    default: 0,
+  },
+}, { timestamps: true });
 
 cartSchema.pre('save', function(next) {
-  this.totalAmount = this.items.reduce((total, item) => {
-    if (item.type === 'customBuild') {
-      return total + ((item.totalPrice || 0) * (item.quantity || 1))
-    } else {
-      return total + ((item.price || 0) * (item.quantity || 1))
-    }
-  }, 0)
-  next()
-})
+  this.totalAmount = this.items.reduce((sum, item) => sum + item.totalPrice * item.quantity, 0);
+  next();
+});
 
-module.exports = mongoose.model('Cart', cartSchema)
+module.exports = mongoose.model('Cart', cartSchema);

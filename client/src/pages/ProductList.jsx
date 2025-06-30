@@ -18,7 +18,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { componentsList } from '../Components/CustomPc/componentsList';
+import { componentsList } from '../utils/componentsList';
 
 const flattenProducts = () => {
   // Flatten all components into a single array of products

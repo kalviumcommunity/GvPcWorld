@@ -2,13 +2,13 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { AuthProvider } from './context/AuthContext';
-import { CartProvider } from './context/CartContext';
 import { useAuth } from './context/AuthContext';
 import theme from './theme';
 import TopNav from './Components/TopNav/TopNav';
 import Footer from './Components/Footer/Footer';
 import LoadingScreen from './Components/LoadingScreen/LoadingScreen';
 import NotFound from './pages/NotFound';
+
 
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
@@ -47,43 +47,33 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <CartProvider>
-          <Router>
-            <Suspense fallback={<LoadingScreen />}>
-              <Layout>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/custom-pc" element={<CustomPC />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/products" element={<ProductList />} />
-                  <Route path="/product/:id" element={<ProductDetail />} />
-                  <Route path="/pre-built" element={<PreBuiltPCs />} />
-                  {/* <Route path="/checkout" element={<Checkout />} /> */}
-                  
-                  {/* Protected Routes */}
-                  {/* <Route 
-                    path="/dashboard" 
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    } 
-                  /> */}
-                  <Route 
-                    path="/profile" 
-                    element={
-                      <ProtectedRoute>
-                        <Profile />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Layout>
-            </Suspense>
-          </Router>
-        </CartProvider>
+        <Router>
+          <Suspense fallback={<LoadingScreen />}>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/custom-pc" element={<CustomPC />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/products" element={<ProductList />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/pre-built" element={<PreBuiltPCs />} />
+                {/* <Route path="/checkout" element={<Checkout />} /> */}
+                
+                {/* Protected Routes */}
+                <Route 
+                  path="/profile" 
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Layout>
+          </Suspense>
+        </Router>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Button, Grid, Paper } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { componentsList } from './componentsList';
+import { componentsList } from '../../utils/componentsList';
 
 const ComponentSelector = ({ 
   currentComponentType, 

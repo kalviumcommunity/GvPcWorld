@@ -12,10 +12,9 @@ const {
 // Apply authentication middleware to all cart routes
 router.all('*', authenticateToken);
 
-// Cart routes with debug logging
 router.get('/', (req, res, next) => {
   console.log('Processing GET cart request');
-  getCart(req, res, next);
+  getCart(req,res,next);
 });
 
 router.post('/add', (req, res, next) => {

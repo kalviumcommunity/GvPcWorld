@@ -6,6 +6,7 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const passport = require('./config/passportConfig');
 const authRoutes = require('./routes/authRoutes');
+const cartRoutes = require('./routes/cartRoutes');
 const productRoutes = require('./routes/productRoutes');
 const connectDB = require('./config/db');
 
@@ -47,12 +48,14 @@ app.use(session({
 // Register routes with explicit mount paths and error handling
 const mountPaths = {
   auth: '/auth',
+  cart: '/cart',
   products: '/products'
 };
 
 // Mount routes with careful error handling
 Object.entries({
   [mountPaths.auth]: authRoutes,
+  [mountPaths.cart]: cartRoutes,
   [mountPaths.products]: productRoutes
 }).forEach(([path, router]) => {
   console.log(`Mounting routes at ${path}`);
@@ -63,8 +66,8 @@ Object.entries({
 });
 
 console.log('All routes registered successfully');
+app.use('/cart', cartRoutes);
 
-// Handle 404s
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });

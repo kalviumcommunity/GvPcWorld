@@ -1,89 +1,153 @@
-const Cart = require('../models/Cart')
+const Cart = require('../models/Cart');
 
-exports.getCart = async (req, res) => {
-  try {
-    const cart = await Cart.findOne({ userId: req.user._id })
-    if (!cart) return res.json({ items: [], totalAmount: 0 })
-    res.json({ items: cart.items, totalAmount: cart.totalAmount })
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch cart' })
-  }
-}
+const addToCart = async (req, res) => {
+// try {
+//     const { userId } = req.body;
 
-exports.addToCart = async (req, res) => {
+//     if (!userId) {
+//       return res.status(400).json({ error: 'userId is required' });
+//     }
+
+//     const cart = await Cart.findOneAndUpdate(
+//       { userId },
+//       { $setOnInsert: { userId, items: [] } }, //array
+//       {
+//         new: true,       
+//         upsert: true,    // create if not found
+//       }
+//     );
+
+//     res.status(200).json(cart);
+//   } catch (error) {
+//     console.error('Error fetching or creating cart:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+
+
   try {
-    const { type } = req.body
-    let cart = await Cart.findOne({ userId: req.user._id })
+    console.log('Processing add to cart request', { body: req.body });
+    const { userId, type, buildName, components, totalPrice, quantity = 1 } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ message: "Missing userId" });
+    }
+
+    let cart = await Cart.findOne({ userId });
+    console.log({cart})
+    const newItem = {
+      type,
+      buildName,
+      components,
+      totalPrice,
+      quantity,
+    };
+
     if (!cart) {
-      cart = new Cart({ userId: req.user._id, items: [] })
-    }
-    let existingIndex = -1
-    if (type === 'product') {
-      existingIndex = cart.items.findIndex(item => item.type === 'product' && item.productId === req.body.productId)
-    } else if (type === 'customBuild') {
-      existingIndex = cart.items.findIndex(item => item.type === 'customBuild' && item.buildName === req.body.buildName)
-    }
-    if (existingIndex !== -1) {
-      cart.items[existingIndex].quantity += req.body.quantity || 1
+      cart = new Cart({
+        userId,
+        items: [newItem],
+      });
     } else {
-      cart.items.push(req.body)
-    }
-    await cart.save()
-    res.json({ items: cart.items, totalAmount: cart.totalAmount })
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to add to cart' })
-  }
-}
+      const existingItem = cart.items.find(
+        item => item.type === type && item.buildName === buildName
+      );
 
-exports.updateCartItem = async (req, res) => {
-  try {
-    const { type, productId, buildName, quantity } = req.body
-    const cart = await Cart.findOne({ userId: req.user._id })
-    if (!cart) return res.status(404).json({ error: 'Cart not found' })
-    let item
-    if (type === 'product') {
-      item = cart.items.find(i => i.type === 'product' && i.productId === productId)
-    } else if (type === 'customBuild') {
-      item = cart.items.find(i => i.type === 'customBuild' && i.buildName === buildName)
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.items.push(newItem);
+      }
     }
-    if (!item) return res.status(404).json({ error: 'Item not found' })
-    if (quantity > 0) {
-      item.quantity = quantity
+
+    await cart.save();
+    res.status(200).json(cart);
+  } catch (error) {
+    res.status(500).json({ message: 'Error adding to cart', error: error.message });
+  }
+};
+
+const getCart = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    console.log({reqQuery: req.query});
+    if (!userId) return res.status(400).json({ message: "Missing userId" });
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      return res.status(200).json({ items: [], totalAmount: 0 });
+    }
+
+    res.status(200).json(cart);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching cart', error: error.message });
+  }
+};
+
+const updateCartItem = async (req, res) => {
+  try {
+    const { userId, type, buildName, quantity } = req.body;
+
+    if (!userId) return res.status(400).json({ message: "Missing userId" });
+
+    const cart = await Cart.findOne({ userId });
+    if (!cart) return res.status(404).json({ message: "Cart not found" });
+
+    const item = cart.items.find(item => item.type === type && item.buildName === buildName);
+    if (!item) return res.status(404).json({ message: "Item not found in cart" });
+
+    if (quantity <= 0) {
+      cart.items = cart.items.filter(i => !(i.type === type && i.buildName === buildName));
     } else {
-      cart.items = cart.items.filter(i => i !== item)
+      item.quantity = quantity;
     }
-    await cart.save()
-    res.json({ items: cart.items, totalAmount: cart.totalAmount })
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to update cart item' })
-  }
-}
 
-exports.removeFromCart = async (req, res) => {
-  try {
-    const { type, productId, buildName } = req.body
-    const cart = await Cart.findOne({ userId: req.user._id })
-    if (!cart) return res.status(404).json({ error: 'Cart not found' })
-    if (type === 'product') {
-      cart.items = cart.items.filter(item => !(item.type === 'product' && item.productId === productId))
-    } else if (type === 'customBuild') {
-      cart.items = cart.items.filter(item => !(item.type === 'customBuild' && item.buildName === buildName))
-    }
-    await cart.save()
-    res.json({ items: cart.items, totalAmount: cart.totalAmount })
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to remove from cart' })
+    await cart.save();
+    res.status(200).json(cart);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating cart item', error: error.message });
   }
-}
+};
 
-exports.clearCart = async (req, res) => {
+const removeFromCart = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ userId: req.user._id })
-    if (!cart) return res.json({ items: [], totalAmount: 0 })
-    cart.items = []
-    await cart.save()
-    res.json({ items: [], totalAmount: 0 })
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to clear cart' })
+    const { userId, type, buildName } = req.body;
+
+    if (!userId) return res.status(400).json({ message: "Missing userId" });
+
+    const cart = await Cart.findOne({ userId });
+    if (!cart) return res.status(404).json({ message: "Cart not found" });
+
+    cart.items = cart.items.filter(item => !(item.type === type && item.buildName === buildName));
+
+    await cart.save();
+    res.status(200).json(cart);
+  } catch (error) {
+    res.status(500).json({ message: 'Error removing item from cart', error: error.message });
   }
-}
+};
+
+const clearCart = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) return res.status(400).json({ message: "Missing userId" });
+
+    const cart = await Cart.findOne({ userId });
+    if (!cart) return res.status(404).json({ message: "Cart not found" });
+
+    cart.items = [];
+    await cart.save();
+    res.status(200).json(cart);
+  } catch (error) {
+    res.status(500).json({ message: 'Error clearing cart', error: error.message });
+  }
+};
+
+module.exports = {
+  addToCart,
+  getCart,
+  updateCartItem,
+  removeFromCart,
+  clearCart,
+};

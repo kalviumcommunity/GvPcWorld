@@ -1,6 +1,6 @@
 import React, { useState, useCallback, memo, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
+import API from '../../Api/api';
 import { useAuth } from '../../context/AuthContext';
 import './TopNav.css';
 
@@ -14,9 +14,9 @@ const navItems = [
 const TopNav = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
-  const { cartCount } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
@@ -26,6 +26,18 @@ const TopNav = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      try {
+        const res = await API.get('/cart');
+        setCartCount(res.data.items ? res.data.items.length : 0);
+      } catch {
+        setCartCount(0);
+      }
+    };
+    if (isAuthenticated) fetchCartCount();
+  }, [isAuthenticated]);
 
   const handleLogout = useCallback(async () => {
     await logout();

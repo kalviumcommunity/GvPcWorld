@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, LinearProgress } from '@mui/material';
-import { componentsList } from './componentsList';
+import { componentsList } from '../../utils/componentsList';
 
 const ProgressBar = ({ components }) => {
   const totalComponents = Object.keys(componentsList).length;
