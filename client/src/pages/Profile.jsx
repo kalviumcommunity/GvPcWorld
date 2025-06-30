@@ -15,6 +15,8 @@ import { Edit as EditIcon, Logout as LogoutIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,7 @@ const Profile = () => {
     const fetchUserProfile = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:4500/auth/success', {
+        const response = await axios.get(`${API_URL}/auth/success`, {
           withCredentials: true
         });
         
@@ -52,7 +54,7 @@ const Profile = () => {
   const handleLogout = async () => {
     try {
       // Call logout endpoint
-      await axios.post('http://localhost:4500/auth/logout', {}, {
+      await axios.post(`${API_URL}/auth/logout`, {}, {
         withCredentials: true
       });
       
@@ -193,4 +195,4 @@ const Profile = () => {
   );
 };
 
-export default Profile; 
+export default Profile;

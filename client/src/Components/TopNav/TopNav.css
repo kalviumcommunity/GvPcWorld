@@ -9,8 +9,12 @@
   transition: background 0.3s, box-shadow 0.3s;
 }
 .topnav--scrolled {
-  background: linear-gradient(90deg, #2196f3 0%, #1976d2 100%);
+  background: linear-gradient(90deg, #73bcf7 0%, #1976d2 100%);
   box-shadow: 0 4px 16px rgba(33, 150, 243, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background 0.3s, box-shadow 0.3s, backdrop-filter 0.3s;
+  color: #fff;
 }
 .topnav__container {
   max-width: 1200px;

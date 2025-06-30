@@ -1,123 +1,89 @@
-const Cart = require('../models/Cart');
+const Cart = require('../models/Cart')
 
-// Get user's cart
-const getCart = async (req, res) => {
+exports.getCart = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ userId: req.user._id });
-    if (!cart) {
-      return res.status(200).json({ items: [], totalAmount: 0 });
-    }
-    res.status(200).json(cart);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching cart', error: error.message });
+    const cart = await Cart.findOne({ userId: req.user._id })
+    if (!cart) return res.json({ items: [], totalAmount: 0 })
+    res.json({ items: cart.items, totalAmount: cart.totalAmount })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch cart' })
   }
-};
+}
 
-// Add item to cart
-const addToCart = async (req, res) => {
+exports.addToCart = async (req, res) => {
   try {
-    const { productId, name, price, quantity, image } = req.body;
-    let cart = await Cart.findOne({ userId: req.user._id });
-
+    const { type } = req.body
+    let cart = await Cart.findOne({ userId: req.user._id })
     if (!cart) {
-      cart = new Cart({
-        userId: req.user._id,
-        items: [{
-          productId,
-          name,
-          price,
-          quantity,
-          image
-        }]
-      });
+      cart = new Cart({ userId: req.user._id, items: [] })
+    }
+    let existingIndex = -1
+    if (type === 'product') {
+      existingIndex = cart.items.findIndex(item => item.type === 'product' && item.productId === req.body.productId)
+    } else if (type === 'customBuild') {
+      existingIndex = cart.items.findIndex(item => item.type === 'customBuild' && item.buildName === req.body.buildName)
+    }
+    if (existingIndex !== -1) {
+      cart.items[existingIndex].quantity += req.body.quantity || 1
     } else {
-      const existingItem = cart.items.find(item => item.productId === productId);
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        cart.items.push({
-          productId,
-          name,
-          price,
-          quantity,
-          image
-        });
-      }
+      cart.items.push(req.body)
     }
-
-    await cart.save();
-    res.status(200).json(cart);
-  } catch (error) {
-    res.status(500).json({ message: 'Error adding to cart', error: error.message });
+    await cart.save()
+    res.json({ items: cart.items, totalAmount: cart.totalAmount })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add to cart' })
   }
-};
+}
 
-// Update cart item quantity
-const updateCartItem = async (req, res) => {
+exports.updateCartItem = async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
-    const cart = await Cart.findOne({ userId: req.user._id });
-
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
+    const { type, productId, buildName, quantity } = req.body
+    const cart = await Cart.findOne({ userId: req.user._id })
+    if (!cart) return res.status(404).json({ error: 'Cart not found' })
+    let item
+    if (type === 'product') {
+      item = cart.items.find(i => i.type === 'product' && i.productId === productId)
+    } else if (type === 'customBuild') {
+      item = cart.items.find(i => i.type === 'customBuild' && i.buildName === buildName)
     }
-
-    const item = cart.items.find(item => item.productId === productId);
-    if (!item) {
-      return res.status(404).json({ message: 'Item not found in cart' });
-    }
-
-    if (quantity <= 0) {
-      cart.items = cart.items.filter(item => item.productId !== productId);
+    if (!item) return res.status(404).json({ error: 'Item not found' })
+    if (quantity > 0) {
+      item.quantity = quantity
     } else {
-      item.quantity = quantity;
+      cart.items = cart.items.filter(i => i !== item)
     }
-
-    await cart.save();
-    res.status(200).json(cart);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating cart', error: error.message });
+    await cart.save()
+    res.json({ items: cart.items, totalAmount: cart.totalAmount })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update cart item' })
   }
-};
+}
 
-// Remove item from cart
-const removeFromCart = async (req, res) => {
+exports.removeFromCart = async (req, res) => {
   try {
-    const { productId } = req.params;
-    const cart = await Cart.findOne({ userId: req.user._id });
-
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
+    const { type, productId, buildName } = req.body
+    const cart = await Cart.findOne({ userId: req.user._id })
+    if (!cart) return res.status(404).json({ error: 'Cart not found' })
+    if (type === 'product') {
+      cart.items = cart.items.filter(item => !(item.type === 'product' && item.productId === productId))
+    } else if (type === 'customBuild') {
+      cart.items = cart.items.filter(item => !(item.type === 'customBuild' && item.buildName === buildName))
     }
-
-    cart.items = cart.items.filter(item => item.productId !== productId);
-    await cart.save();
-    res.status(200).json(cart);
-  } catch (error) {
-    res.status(500).json({ message: 'Error removing item from cart', error: error.message });
+    await cart.save()
+    res.json({ items: cart.items, totalAmount: cart.totalAmount })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to remove from cart' })
   }
-};
+}
 
-// Clear cart
-const clearCart = async (req, res) => {
+exports.clearCart = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ userId: req.user._id });
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
-    }
-
-    cart.items = [];
-    await cart.save();
-    res.status(200).json(cart);
-  } catch (error) {
-    res.status(500).json({ message: 'Error clearing cart', error: error.message });
+    const cart = await Cart.findOne({ userId: req.user._id })
+    if (!cart) return res.json({ items: [], totalAmount: 0 })
+    cart.items = []
+    await cart.save()
+    res.json({ items: [], totalAmount: 0 })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to clear cart' })
   }
-};
-
-module.exports = {
-  getCart,
-  addToCart,
-  updateCartItem,
-  removeFromCart,
-  clearCart
-};
+}

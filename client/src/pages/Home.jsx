@@ -32,7 +32,7 @@ const Home = () => {
   }, [navigate]);
 
   const handleBrowseProducts = React.useCallback(() => {
-    navigate('/products/components');
+    navigate('/products');
   }, [navigate]);
 
   // Memoize categories data

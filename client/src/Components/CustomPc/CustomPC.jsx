@@ -39,28 +39,47 @@ const CustomPC = () => {
     }
   }, [customPCs, user]);
 
+  useEffect(() => {
+    // Save current build to sessionStorage on change
+    if (Object.keys(selectedComponents).length > 0) {
+      sessionStorage.setItem('currentCustomBuild', JSON.stringify({
+        selectedComponents,
+        currentBuildName
+      }));
+    }
+  }, [selectedComponents, currentBuildName]);
+
+  useEffect(() => {
+    // Restore build from sessionStorage on mount
+    const saved = sessionStorage.getItem('currentCustomBuild');
+    if (saved) {
+      const { selectedComponents, currentBuildName } = JSON.parse(saved);
+      setSelectedComponents(selectedComponents || {});
+      setCurrentBuildName(currentBuildName || 'My Custom PC');
+    }
+  }, []);
+
   const isPCComplete = Object.keys(componentsList).every(
     (type) => selectedComponents[type]
   );
 
-  const handleAddComponent = () => {
-    if (currentComponentType && currentComponent) {
-      const componentPrice = componentsList[currentComponentType][currentComponent].price;
-      const componentImage = componentsList[currentComponentType][currentComponent].image;
-      
+  const handleAddComponent = (componentName) => {
+    const comp = componentName || currentComponent;
+    if (currentComponentType && comp) {
+      const componentPrice = componentsList[currentComponentType][comp].price;
+      const componentImage = componentsList[currentComponentType][comp].image;
       setSelectedComponents((prev) => ({
         ...prev,
         [currentComponentType]: {
           category: currentComponentType,
-          component: currentComponent,
+          component: comp,
           price: componentPrice,
           image: componentImage
         },
       }));
-      
       setCurrentComponentType("");
       setCurrentComponent("");
-      toast.success(`Added ${currentComponent} to your build`);
+      toast.success(`Added ${comp} to your build`);
     }
   };
 
@@ -71,22 +90,32 @@ const CustomPC = () => {
     toast.info(`Removed ${componentType} from your build`);
   };
 
-  const handleAddToCart = () => {
-    if (!isPCComplete) {
-      toast.warning("Please select all components before adding to cart.");
-      return;
-    }
-    
-    const newPC = {
+  const handleAddToCart = (pcToAdd) => {
+    const pc = pcToAdd || {
       id: generateRandomId(),
       name: currentBuildName,
-      components: {...selectedComponents},
+      components: { ...selectedComponents },
       totalPrice: calculateTotalPrice(selectedComponents),
       createdAt: new Date().toISOString()
     };
-    
-    addToCart(newPC);
-    setCustomPCs([...customPCs, newPC]);
+    if (!pc.components || typeof pc.components !== 'object') {
+      toast.error('Build components are missing or invalid.');
+      return;
+    }
+    if (!Object.keys(pc.components).length || !Object.keys(componentsList).every((type) => pc.components[type])) {
+      toast.warning("Please select all components before adding to cart.");
+      return;
+    }
+    const cartItem = {
+      type: 'customBuild',
+      buildName: pc.name,
+      components: pc.components,
+      totalPrice: pc.totalPrice,
+      quantity: 1,
+      createdAt: pc.createdAt
+    };
+    addToCart(cartItem);
+    setCustomPCs([...customPCs, pc]);
     setSelectedComponents({});
     setCurrentBuildName("My Custom PC");
     toast.success("PC added to cart successfully!");
@@ -136,15 +165,17 @@ const CustomPC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 4 }, minHeight: '100vh' }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 4 }, minHeight: '100vh', px: { xs: 0.5, sm: 2 } }}>
       <Paper elevation={6} sx={{
         bgcolor: 'background.paper',
-        p: { xs: 1.5, sm: 3, md: 5 },
-        borderRadius: 4,
+        p: { xs: 1, sm: 3, md: 5 },
+        borderRadius: { xs: 0, sm: 4 },
         boxShadow: '0 4px 32px 0 rgba(0,0,0,0.10)',
         overflow: 'hidden',
         minHeight: '80vh',
         transition: 'box-shadow 0.3s',
+        width: '100%',
+        maxWidth: { xs: '100vw', sm: 'unset' },
       }}>
         <Box sx={{
           display: 'flex',
@@ -164,6 +195,7 @@ const CustomPC = () => {
               minWidth: { xs: '100%', sm: 220 },
               bgcolor: 'background.default',
               borderRadius: 2,
+              mb: { xs: 2, sm: 0 },
               '& .MuiOutlinedInput-root': {
                 color: 'text.primary',
                 borderRadius: 2,
@@ -226,11 +258,11 @@ const CustomPC = () => {
         </Box>
         <Box sx={{ mb: 3 }}>
           <ComponentSelector
-            componentType={currentComponentType}
-            component={currentComponent}
-            onComponentTypeChange={setCurrentComponentType}
-            onComponentChange={setCurrentComponent}
-            onAdd={handleAddComponent}
+            currentComponentType={currentComponentType}
+            setCurrentComponentType={setCurrentComponentType}
+            currentComponent={currentComponent}
+            setCurrentComponent={setCurrentComponent}
+            handleAddComponent={handleAddComponent}
             selectedComponents={selectedComponents}
           />
         </Box>

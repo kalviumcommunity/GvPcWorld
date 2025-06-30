@@ -67,19 +67,19 @@ const Footer = () => {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <Email fontSize="small" color="primary" />
         <Typography variant="body2" color="text.secondary">
-          support@gvpcworld.com
+          gouransh29@gmail.com
         </Typography>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <Phone fontSize="small" color="primary" />
         <Typography variant="body2" color="text.secondary">
-          +1 (555) 123-4567
+          shops phone nu.
         </Typography>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <LocationOn fontSize="small" color="primary" />
         <Typography variant="body2" color="text.secondary">
-          123 PC Street, Tech City, TC 12345
+          my future client's address
         </Typography>
       </Box>
     </Box>
@@ -129,7 +129,6 @@ const Footer = () => {
             </FooterSection>
           </Grid>
 
-          {/* Quick Links */}
           <Grid item xs={12} md={4}>
             <FooterSection title="Quick Links">
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

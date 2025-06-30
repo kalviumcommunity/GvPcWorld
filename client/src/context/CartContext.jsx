@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useAuth } from './AuthContext';
 import { toast } from 'react-toastify';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const CartContext = createContext();
 
 export const useCart = () => {
@@ -15,7 +17,6 @@ export const CartProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const { isAuthenticated, user } = useAuth();
 
-  // Fetch cart from backend
   const fetchCart = useCallback(async () => {
     if (!isAuthenticated) {
       setCartItems([]);
@@ -24,7 +25,8 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      setLoading(true);      const response = await axios.get('http://localhost:4000/cart', { 
+      setLoading(true);
+      const response = await axios.get(`${API_URL}/cart`, { 
         withCredentials: true 
       });
       setCartItems(response.data.items || []);
@@ -37,12 +39,11 @@ export const CartProvider = ({ children }) => {
     }
   }, [isAuthenticated]);
 
-  // Fetch cart on auth state change
   useEffect(() => {
     fetchCart();
   }, [fetchCart, isAuthenticated]);
 
-  // Add item to cart
+  // our proud add item to cart
   const addToCart = async (item) => {
     if (!isAuthenticated) {
       toast.error('Please login to add items to cart');
@@ -52,7 +53,7 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await axios.post(
-        'http://localhost:4000/cart/add',
+        `${API_URL}/cart/add`,
         item,
         { withCredentials: true }
       );
@@ -66,11 +67,11 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Update cart item quantity
   const updateCartItem = async (productId, quantity) => {
     try {
       setLoading(true);
-      const response = await axios.put(        'http://localhost:4000/cart/update',
+      const response = await axios.put(
+        `${API_URL}/cart/update`,
         { productId, quantity },
         { withCredentials: true }
       );
@@ -83,11 +84,12 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Remove item from cart
+  // remove item from cart,, this is to changed as user can remove custom builds
   const removeFromCart = async (productId) => {
     try {
       setLoading(true);
-      const response = await axios.delete(        `http://localhost:4000/cart/delete/${productId}`,
+      const response = await axios.delete(
+        `${API_URL}/cart/delete/${productId}`,
         { withCredentials: true }
       );
       setCartItems(response.data.items);
@@ -104,7 +106,8 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     try {
       setLoading(true);
-      const response = await axios.delete(        'http://localhost:4000/cart/delete/all',
+      const response = await axios.delete(
+        `${API_URL}/cart/delete/all`,
         { withCredentials: true }
       );
       setCartItems(response.data.items);

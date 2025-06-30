@@ -10,7 +10,6 @@ import Footer from './Components/Footer/Footer';
 import LoadingScreen from './Components/LoadingScreen/LoadingScreen';
 import NotFound from './pages/NotFound';
 
-// Lazy load pages for better performance
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const CustomPC = lazy(() => import('./Components/CustomPc/CustomPC'));
@@ -20,8 +19,6 @@ const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const Profile = lazy(() => import('./pages/Profile'));
 const PreBuiltPCs = lazy(() => import('./pages/PreBuiltPCs'));
 
-
-// Protected Route component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   
@@ -55,7 +52,6 @@ function App() {
             <Suspense fallback={<LoadingScreen />}>
               <Layout>
                 <Routes>
-                  {/* Public Routes */}
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/custom-pc" element={<CustomPC />} />
@@ -82,8 +78,6 @@ function App() {
                       </ProtectedRoute>
                     } 
                   />
-                  
-                  {/* 404 Route */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Layout>

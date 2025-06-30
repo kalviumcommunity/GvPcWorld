@@ -37,8 +37,8 @@ const SavedBuilds = ({ builds, onEdit, onDuplicate, onAddToCart }) => {
         },
       }}>
         <Grid container spacing={3}>
-          {builds.map((pc, index) => (
-            <Grid item xs={12} md={6} lg={4} key={pc.id}>
+          {builds.slice(0, 3).map((pc, index) => (
+            <Grid item xs={12} md={6} lg={4} key={pc.id || (pc.name + '-' + index)}>
               <Fade in timeout={400 + index * 100}>
                 <Paper sx={{
                   bgcolor: 'background.default',
@@ -114,7 +114,7 @@ const SavedBuilds = ({ builds, onEdit, onDuplicate, onAddToCart }) => {
                       Copy
                     </Button>
                     <Button
-                      onClick={() => onAddToCart(pc)}
+                      onClick={() => onAddToCart({ ...pc, type: 'custom' })}
                       variant="contained"
                       color="primary"
                       size="small"

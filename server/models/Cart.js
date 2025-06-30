@@ -1,28 +1,42 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const cartItemSchema = new mongoose.Schema({
-  productId: {
+  type: {
     type: String,
-    required: true
+    required: true,
+    enum: ['product', 'customBuild']
+  },
+  productId: {
+    type: String
   },
   name: {
-    type: String,
-    required: true
+    type: String
   },
   price: {
-    type: Number,
-    required: true
+    type: Number
+  },
+  image: {
+    type: String
+  },
+  buildName: {
+    type: String
+  },
+  components: {
+    type: Object
+  },
+  totalPrice: {
+    type: Number
   },
   quantity: {
     type: Number,
     required: true,
-    min: 1
+    min: 1,
+    default: 1
   },
-  image: {
-    type: String,
-    required: true
+  description: {
+    type: String
   }
-}, { _id: false });
+}, { _id: false })
 
 const cartSchema = new mongoose.Schema({
   userId: {
@@ -38,14 +52,17 @@ const cartSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true
-});
+})
 
-// Pre-save middleware to calculate total amount
 cartSchema.pre('save', function(next) {
   this.totalAmount = this.items.reduce((total, item) => {
-    return total + (item.price * item.quantity);
-  }, 0);
-  next();
-});
+    if (item.type === 'customBuild') {
+      return total + ((item.totalPrice || 0) * (item.quantity || 1))
+    } else {
+      return total + ((item.price || 0) * (item.quantity || 1))
+    }
+  }, 0)
+  next()
+})
 
-module.exports = mongoose.model('Cart', cartSchema);
+module.exports = mongoose.model('Cart', cartSchema)

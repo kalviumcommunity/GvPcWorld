@@ -1,0 +1,13 @@
+Delete these files manually if not already deleted:
+
+client/src/Components/Cart/Cart.jsx
+client/src/Components/Cart/CartItem.jsx
+client/src/Components/Cart/CartSummary.jsx
+client/src/context/CartContext.jsx
+server/models/Cart.js
+server/controllers/cartController.js
+server/routes/cartRoutes.js
+
+All references to Cart, CartProvider, useCart, and cart routes have been removed from App.jsx and server.js.
+
+If you see any cart-related code or UI, remove it from other files as well.

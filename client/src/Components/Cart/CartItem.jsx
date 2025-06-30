@@ -17,9 +17,16 @@ import { useCart } from '../../context/CartContext';
 const CartItem = memo(({ item, loading }) => {
   const { updateCartItem, removeFromCart } = useCart();
 
+  // Determine if this is a custom build or a regular product
+  const isCustomBuild = item.type === 'custom';
+  const displayName = isCustomBuild ? item.name || 'Custom PC Build' : item.name;
+  const displayPrice = isCustomBuild ? item.totalPrice : item.price;
+  const displayQuantity = item.quantity || 1;
+  const displayImage = isCustomBuild ? '/custom-pc-placeholder.png' : item.image;
+
   const handleQuantityChange = async (newQuantity) => {
     try {
-      if (newQuantity > 0) {
+      if (newQuantity > 0 && !isCustomBuild) {
         await updateCartItem(item.productId, newQuantity);
       }
     } catch (error) {
@@ -29,7 +36,7 @@ const CartItem = memo(({ item, loading }) => {
 
   const handleRemove = async () => {
     try {
-      await removeFromCart(item.productId);
+      await removeFromCart(item.productId || item.id);
     } catch (error) {
       console.error('Error removing item:', error);
     }
@@ -77,8 +84,8 @@ const CartItem = memo(({ item, loading }) => {
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Box 
             component="img"
-            src={item.image}
-            alt={item.name}
+            src={displayImage}
+            alt={displayName}
             sx={{ 
               width: 100,
               height: 100,
@@ -89,15 +96,29 @@ const CartItem = memo(({ item, loading }) => {
           />
           <Box sx={{ flex: 1 }}>
             <Typography variant="h6" gutterBottom>
-              {item.name}
+              {displayName}
             </Typography>
+            {isCustomBuild && item.components && (
+              <Box sx={{ mb: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Components:
+                </Typography>
+                <ul style={{ margin: 0, paddingLeft: 18 }}>
+                  {Object.entries(item.components).map(([type, comp]) => (
+                    <li key={type} style={{ fontSize: 13 }}>
+                      <b>{type}:</b> {comp.name || comp}
+                    </li>
+                  ))}
+                </ul>
+              </Box>
+            )}
             <Typography 
               variant="subtitle1" 
               color="primary.main" 
               fontWeight="bold" 
               gutterBottom
             >
-              ₹{(item.price * item.quantity).toLocaleString()}
+              ₹{(displayPrice * displayQuantity).toLocaleString()}
             </Typography>
             <Box sx={{ 
               display: 'flex', 
@@ -105,41 +126,48 @@ const CartItem = memo(({ item, loading }) => {
               justifyContent: 'space-between',
               mt: 1
             }}>
-              <ButtonGroup 
-                size="small" 
-                sx={{ 
-                  '& .MuiButtonGroup-grouped:not(:last-of-type)': {
-                    borderColor: 'divider'
-                  }
-                }}
-              >
-                <IconButton
-                  onClick={() => handleQuantityChange(item.quantity - 1)}
-                  disabled={item.quantity <= 1}
-                  size="small"
-                >
-                  <RemoveIcon fontSize="small" />
-                </IconButton>
-                <Button 
+              {!isCustomBuild && (
+                <ButtonGroup 
+                  size="small" 
                   sx={{ 
-                    minWidth: '40px',
-                    px: 2,
-                    cursor: 'default',
-                    '&:hover': {
-                      bgcolor: 'background.paper'
+                    '& .MuiButtonGroup-grouped:not(:last-of-type)': {
+                      borderColor: 'divider'
                     }
                   }}
-                  disableRipple
                 >
-                  {item.quantity}
-                </Button>
-                <IconButton
-                  onClick={() => handleQuantityChange(item.quantity + 1)}
-                  size="small"
-                >
-                  <AddIcon fontSize="small" />
-                </IconButton>
-              </ButtonGroup>
+                  <IconButton
+                    onClick={() => handleQuantityChange(displayQuantity - 1)}
+                    disabled={displayQuantity <= 1}
+                    size="small"
+                  >
+                    <RemoveIcon fontSize="small" />
+                  </IconButton>
+                  <Button 
+                    sx={{ 
+                      minWidth: '40px',
+                      px: 2,
+                      cursor: 'default',
+                      '&:hover': {
+                        bgcolor: 'background.paper'
+                      }
+                    }}
+                    disableRipple
+                  >
+                    {displayQuantity}
+                  </Button>
+                  <IconButton
+                    onClick={() => handleQuantityChange(displayQuantity + 1)}
+                    size="small"
+                  >
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </ButtonGroup>
+              )}
+              {isCustomBuild && (
+                <Typography variant="body2" color="text.secondary">
+                  Qty: 1
+                </Typography>
+              )}
               <IconButton 
                 onClick={handleRemove}
                 color="error"

@@ -91,7 +91,6 @@ const Cart = () => {
           overflow: 'hidden'
         }}
       >
-        {/* Header */}
         <Box sx={{ 
           display: 'flex', 
           flexDirection: { xs: 'column', sm: 'row' },
@@ -144,7 +143,7 @@ const Cart = () => {
               <Box sx={{ mb: 4 }}>
                 {cartItems.map(item => (
                   <CartItem 
-                    key={item.productId} 
+                    key={item.productId || item.id || (item.name + '-' + Math.random())} 
                     item={item}
                     loading={loading}
                   />
@@ -234,7 +233,7 @@ const Cart = () => {
                 <Button 
                   variant="outlined"
                   size="large"
-                  onClick={() => navigate('/products/components')}
+                  onClick={() => navigate('/products')}
                   sx={{
                     px: 3,
                     py: 1.5,

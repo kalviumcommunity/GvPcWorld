@@ -11,6 +11,8 @@ import {
 import { Google } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,7 +23,7 @@ const Login = () => {
     setError('');
     
     // Redirect to backend Google OAuth route
-    window.location.href = 'http://localhost:4500/auth/google';
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   return (

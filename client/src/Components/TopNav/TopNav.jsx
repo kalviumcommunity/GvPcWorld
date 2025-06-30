@@ -7,7 +7,7 @@ import './TopNav.css';
 const navItems = [
   { text: 'Home', path: '/' },
   { text: 'Custom PC', path: '/custom-pc' },
-  { text: 'Pre-Built PCs', path: '/prebuilt' },
+  { text: 'Pre-Built PCs', path: '/pre-built' },
   { text: 'About Us', path: '/about-us' }
 ];
 
