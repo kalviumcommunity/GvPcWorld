@@ -12,7 +12,6 @@ const connectDB = require('./config/db');
 
 const app = express();
 
-// Trust first proxy for secure cookies in production
 app.set('trust proxy', 1);
 
 // Middleware
@@ -24,35 +23,31 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 
-// Log all incoming requests to help debug route issues
+// Log all incoming requests to help debug route issue
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   next();
 });
 
-// Debug logging for route registration
 console.log('Initializing passport and session...');
 app.use(passport.initialize());
 
-// Configure session if needed
 app.use(session({
   secret: process.env.SESSION_SECRET || 'dev_secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
+    sameSite: 'None'
   }
 }));
 
-// Register routes with explicit mount paths and error handling
 const mountPaths = {
   auth: '/auth',
   cart: '/cart',
   products: '/products'
 };
 
-// Mount routes with careful error handling
 Object.entries({
   [mountPaths.auth]: authRoutes,
   [mountPaths.cart]: cartRoutes,
@@ -72,7 +67,6 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ 

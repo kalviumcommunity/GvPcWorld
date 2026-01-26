@@ -48,16 +48,13 @@ const getProducts = async (req, res) => {
       }
     }
 
-    // Calculate skip value for pagination
     const skip = (page - 1) * limit;
 
-    // Execute query with pagination
     const products = await Product.find(filter)
       .sort(sort)
       .skip(skip)
       .limit(Number(limit));
 
-    // Get total count for pagination
     const total = await Product.countDocuments(filter);
 
     res.status(200).json({
@@ -75,7 +72,6 @@ const getProducts = async (req, res) => {
   }
 };
 
-// Get single product by ID
 const getProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);

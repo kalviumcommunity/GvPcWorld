@@ -7,21 +7,23 @@ import { toast } from 'react-toastify';
 import { Container, Paper, Typography, Box, TextField, Button } from '@mui/material';
 import API from '../../Api/api';
 import {useAuth} from '../../context/AuthContext'
+import { useNavigate } from 'react-router-dom';
 
 const CustomPC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedComponents, setSelectedComponents] = useState({});
   const [currentComponentType, setCurrentComponentType] = useState("");
   const [currentComponent, setCurrentComponent] = useState("");
   const [customPCs, setCustomPCs] = useState([]);
   const [currentBuildName, setCurrentBuildName] = useState("My Custom PC");
+  const [budget, setBudget] = useState(200000); 
+  const [purpose, setPurpose] = useState("Gaming");
 
-  // Load prebuilt configs on first mount
   useEffect(() => {
     setCustomPCs(preBuiltConfigs);
   }, []);
 
-  // Add custom build to cart
  const handleAddToCart = async () => {
     if (!user || !user._id) {
       toast.error("Please log in to add to cart.");
@@ -68,7 +70,6 @@ const CustomPC = () => {
     }
   };
 
-  // Load prebuilt into edit mode
   const handleEditPrebuilt = (prebuilt) => {
     setSelectedComponents(prebuilt.components);
     setCurrentBuildName(prebuilt.name + ' (Edited)');
@@ -76,12 +77,10 @@ const CustomPC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Check if custom build is complete
   const isPCComplete = Object.keys(componentsList).every(
     (type) => selectedComponents[type]
   );
 
-  // Add component from selector
   const handleAddComponent = (componentName) => {
     if (currentComponentType && componentName) {
       const componentData = componentsList[currentComponentType][componentName];
@@ -100,7 +99,6 @@ const CustomPC = () => {
     }
   };
 
-  // Remove a component
   const handleRemoveComponent = (componentType) => {
     const updated = { ...selectedComponents };
     delete updated[componentType];
@@ -108,12 +106,27 @@ const CustomPC = () => {
     toast.info(`Removed ${componentType}`);
   };
 
-  // Reset entire build
   const handleReset = () => {
     setSelectedComponents({});
     setCurrentBuildName("My Custom PC");
     toast.info("Build reset");
   };
+  const handleAIReviewNavigate = () => {
+    if (!isPCComplete) {
+      toast.warning("Please complete your build before getting AI Review.");
+      return;
+    }
+
+    navigate('/review-my-build', {
+      state: {
+        selectedComponents,
+        buildName: currentBuildName,
+        budget,
+        purpose,
+      },
+    });
+  };
+
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -126,7 +139,30 @@ const CustomPC = () => {
             label="Build Name"
           />
         </Box>
+        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+          <TextField
+            label="Your Budget (INR)"
+            type="number"
+            value={budget}
+            onChange={(e) => setBudget(Number(e.target.value))}
+            fullWidth
+          />
 
+          <TextField
+            label="PC Purpose"
+            select
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value)}
+            SelectProps={{ native: true }}
+            fullWidth
+          >
+            <option value="Gaming">Gaming</option>
+            <option value="AI/ML">AI / Machine Learning</option>
+            <option value="Animation">Animation & VFX</option>
+            <option value="Office Work">Office Work</option>
+          </TextField>
+
+        </Box>
         <ProgressBar components={selectedComponents} />
 
         <ComponentSelector
@@ -157,12 +193,21 @@ const CustomPC = () => {
           >
             Add to Cart
           </Button>
+          <Button
+            variant="outlined"
+            color="info"
+            onClick={handleAIReviewNavigate}
+            disabled={!isPCComplete}
+          >
+
+            Get AI Review
+          </Button>
+
           <Button variant="outlined" color="error" onClick={handleReset}>
             Reset
           </Button>
         </Box>
 
-        {/* Prebuilt PC section */}
         <Box sx={{ mt: 6 }}>
           <Typography variant="h5" fontWeight={600} mb={2}>Pre-Built PCs</Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>

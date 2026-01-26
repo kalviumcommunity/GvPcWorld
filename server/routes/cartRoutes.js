@@ -8,8 +8,6 @@ const {
   removeFromCart,
   clearCart
 } = require('../controllers/cartController');
-
-// Apply authentication middleware to all cart routes
 router.all('*', authenticateToken);
 
 router.get('/', (req, res, next) => {

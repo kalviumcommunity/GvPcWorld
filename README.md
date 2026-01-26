@@ -2,7 +2,7 @@
 
 GVPCWorld is a web-based platform designed to connect graduates with potential employers in the tech industry. The application provides a seamless user experience through modern web technologies and intuitive design.
 
-## 🚀 Features
+##  Features
 
 - **User Authentication**: Secure login with Google OAuth 2.0
 - **Personalized Dashboard**: View and manage your profile and activities
@@ -11,7 +11,7 @@ GVPCWorld is a web-based platform designed to connect graduates with potential e
 - **Shopping Cart**: Add and manage items in your cart
 - **Responsive Design**: Access the platform from any device
 
-## 🛠️ Technology Stack
+## 🛠 Technology Stack
 
 ### Frontend
 - **React.js**: For building dynamic and responsive user interfaces
@@ -27,7 +27,7 @@ GVPCWorld is a web-based platform designed to connect graduates with potential e
 - **Passport.js**: Authentication middleware
 - **JWT**: For secure authentication
 
-## 🏗️ Project Structure
+## 🏗 Project Structure
 
 ```
 GVPCWorld-mern/
@@ -46,7 +46,7 @@ GVPCWorld-mern/
 └── ...
 ```
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js (v14 or higher)
@@ -78,6 +78,7 @@ Create a `.env` file in the server/server directory with the following variables
 JWT_SECRET=your_jwt_secret
 CLIENT_ID=your_google_client_id
 CLIENT_SECRET=your_google_client_secret
+and a mock db json file or your db uri
 ```
 
 4. Start the development servers
@@ -88,22 +89,22 @@ npm start
 
 # Start the frontend server
 cd ../../client
-npm run dev
+npm run dev # i am using nodemon here 
 ```
 
 5. Access the application
-Open your browser and navigate to `http://localhost:4500`
+Open your browser and navigate to `http://localhost:4500` for api and Navigste to port 5173 for frontend
 
 ## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👥 Contributors
+##  Contributors
 
-- Your Name - Initial work
+- gouranshvaishnavji #and will always be me only
 
 ## 🙏 Acknowledgments
 
 - Google OAuth for authentication
-- Material-UI for UI components
-- MongoDB for database 
+- MongoDB for database
+- will be updating the code style to align with test driven development and work on decoupling the logic for testing and using mock data easily

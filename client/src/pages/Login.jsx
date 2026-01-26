@@ -22,7 +22,6 @@ const Login = () => {
     setLoading(true);
     setError('');
     
-    // Redirect to backend Google OAuth route
     window.location.href = `${API_URL}/auth/google`;
   };
 
@@ -80,4 +79,3 @@ const Login = () => {
 };
 
 export default Login;
-

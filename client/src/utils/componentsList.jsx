@@ -1,6 +1,6 @@
 export const componentsList = {
     BoxCase: {
-      "Standard Box": { price: 2000, image: "/images/boxcase.png" },
+      "Standard Box": { price: 2000, image: "../../assests/images/boxcase.png" },
       "RGB Box": { price: 5000, image: "C:\Users\vaish\OneDrive\Desktop\Projects\GvPcWorld-mern\client\src\assets\images\boxcase.png" },
       "Full Tower Box": { price: 8000, image: "../../assets/images/boxcase.png" },
     },

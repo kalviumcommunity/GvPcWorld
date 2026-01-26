@@ -4,7 +4,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { authenticateToken } = require('../middleware/authMiddleware');
-const User = require('../models/user.js');
+const User = require('../models/User.js');
 
 // Google OAuth routes with debug logging
 router.get('/google', (req, res, next) => {
@@ -38,7 +38,7 @@ router.get('/google/callback', (req, res, next) => {
       res.cookie('jwt', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        sameSite: 'None',
         maxAge: 3600000 // 1 hour in milliseconds
       });
       
@@ -56,7 +56,7 @@ router.post('/logout', (req, res) => {
     res.clearCookie('jwt', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'None',
     });
     res.status(200).json({ message: 'Logged out successfully' });
   } catch (error) {
@@ -65,7 +65,6 @@ router.post('/logout', (req, res) => {
   }
 });
 
-// Check authentication status
 router.get('/success', authenticateToken, async (req, res) => {
   console.log('Handling /success route, user:', req.user);
   try {

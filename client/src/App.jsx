@@ -8,19 +8,20 @@ import TopNav from './Components/TopNav/TopNav';
 import Footer from './Components/Footer/Footer';
 import LoadingScreen from './Components/LoadingScreen/LoadingScreen';
 import NotFound from './pages/NotFound';
-
+import AIReview from './pages/AIReview';
 
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const CustomPC = lazy(() => import('./Components/CustomPc/CustomPC'));
 const Cart = lazy(() => import('./Components/Cart/Cart'));
 const ProductList = lazy(() => import('./pages/ProductList'));
-const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+// const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const Profile = lazy(() => import('./pages/Profile'));
 const PreBuiltPCs = lazy(() => import('./pages/PreBuiltPCs'));
-
+const AboutUs = lazy(() => import('./pages/AboutUS'));
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
+  
   
   if (loading) {
     return <LoadingScreen />;
@@ -55,12 +56,12 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/custom-pc" element={<CustomPC />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/review-my-build" element={<AIReview />} />
                 <Route path="/products" element={<ProductList />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
+                {/* <Route path="/product/:id" element={<ProductDetail />} /> */}
                 <Route path="/pre-built" element={<PreBuiltPCs />} />
                 {/* <Route path="/checkout" element={<Checkout />} /> */}
-                
-                {/* Protected Routes */}
+                <Route path='/about-us' element={<AboutUs />} />
                 <Route 
                   path="/profile" 
                   element={

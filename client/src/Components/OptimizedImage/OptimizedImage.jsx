@@ -15,7 +15,6 @@ const OptimizedImage = memo(({
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    // Reset states when src changes
     setLoaded(false);
     setError(false);
   }, [src]);
@@ -26,7 +25,7 @@ const OptimizedImage = memo(({
 
   const handleError = () => {
     setError(true);
-    setLoaded(true); // Show fallback instead of loading state
+    setLoaded(true); 
   };
 
   return (
