@@ -1,6 +1,7 @@
 # GVPCWorld Platform
 
-GVPCWorld is a web-based platform designed to connect graduates with potential employers in the tech industry. The application provides a seamless user experience through modern web technologies and intuitive design.
+GVPCWorld is a web-based platform designed to showcase my expertise in web development --  under process of becoming better every day
+
 
 ##  Features
 
