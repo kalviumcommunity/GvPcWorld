@@ -1,35 +1,43 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import passport from 'passport';
 import dotenv from 'dotenv';  
 import connectDB from './config/db.js';
 import User from './models/User.js';
-import {} from './models/Cart.js';
-// import router from './routes/authRoutes.js';
-// import cartRoutes from './routes/cartRoutes.js';
-// import productRoutes from './routes/productRoutes.js';
-console.log(typeof express);
+import {Cart, Item} from './models/Cart.js';
+import authroutes from './routes/auth.js';
+import requestContext from './middleware/requestContext.js';
+import errorHandler from './middleware/errorHandler.js';
+// we are going on a new journey and this is important to do.
+
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(requestContext); 
 connectDB();
+app.use('/auth', authroutes);
 app.post('/test', async (req, res) => {
   try {
-    const {productid, quantity, price, isCustomBuild, selectedComponents} = req.body;
-    const user = await User.create({ productid, quantity, price, isCustomBuild, selectedComponents });
-    res.status(201).json({ message: 'product added succefully created successfully', user });
+   const { productId, quantity, price, isCustomBuild, selectedComponents } = req.body;
+
+  const item = await Item.create({
+    productId,
+    quantity,
+    price,
+    isCustomBuild,
+    selectedComponents
+  });
+    res.status(201).json({ message: 'product added succefully created successfully', item });
   }
 
   catch (error) {
-    console.error('Error creating user:', error);
+    console.error('Error creating item:', error);
     res.status(500).json({ message: 'Internal server error' });
   } 
 });
 app.set('trust proxy', 1);
 
-// Middleware
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ 
@@ -38,45 +46,13 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 
-// Log all incoming requests to help debug route issue
+
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   next();
 });
 
-// console.log('Initializing passport and session...');
-// app.use(passport.initialize());
 
-// app.use(session({
-//   secret: process.env.SESSION_SECRET || 'dev_secret',
-//   resave: false,
-//   saveUninitialized: false,
-//   cookie: {
-//     secure: process.env.NODE_ENV === 'production',
-//     sameSite: 'None'
-//   }
-// }));
-
-const mountPaths = {
-  auth: '/auth',
-  cart: '/cart',
-  products: '/products'
-};
-
-// Object.entries({
-//   [mountPaths.auth]: authRoutes,
-//   [mountPaths.cart]: cartRoutes,
-//   [mountPaths.products]: productRoutes
-// }).forEach(([path, router]) => {
-//   console.log(`Mounting routes at ${path}`);
-//   app.use(path, (req, res, next) => {
-//     console.log(`Processing ${req.method} request to ${path}${req.url}`);
-//     router(req, res, next);
-//   });
-// });
-
-// console.log('All routes registered successfully');
-// app.use('/cart', cartRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
@@ -90,7 +66,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-
+app.use(errorHandler)
 const PORT = process.env.PORT || 4000;
 const startServer = async () => {
   try {
