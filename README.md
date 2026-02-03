@@ -95,16 +95,9 @@ npm run dev # i am using nodemon here
 5. Access the application
 Open your browser and navigate to `http://localhost:4500` for api and Navigste to port 5173 for frontend
 
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-##  Contributors
 
 - gouranshvaishnavji #and will always be me only
 
-## 🙏 Acknowledgments
-
-- Google OAuth for authentication
-- MongoDB for database
+##  Acknowledgments
+- MongoDB for database ,, and will move to sql now when schema is finalized
 - will be updating the code style to align with test driven development and work on decoupling the logic for testing and using mock data easily

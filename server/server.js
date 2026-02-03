@@ -1,17 +1,32 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const session = require('express-session');
-const cookieParser = require('cookie-parser');
-const passport = require('./config/passportConfig');
-const authRoutes = require('./routes/authRoutes');
-const cartRoutes = require('./routes/cartRoutes');
-const productRoutes = require('./routes/productRoutes');
-const connectDB = require('./config/db');
-
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import passport from 'passport';
+import dotenv from 'dotenv';  
+import connectDB from './config/db.js';
+import User from './models/User.js';
+import {} from './models/Cart.js';
+// import router from './routes/authRoutes.js';
+// import cartRoutes from './routes/cartRoutes.js';
+// import productRoutes from './routes/productRoutes.js';
+console.log(typeof express);
+dotenv.config();
 const app = express();
+app.use(express.json());
+connectDB();
+app.post('/test', async (req, res) => {
+  try {
+    const {productid, quantity, price, isCustomBuild, selectedComponents} = req.body;
+    const user = await User.create({ productid, quantity, price, isCustomBuild, selectedComponents });
+    res.status(201).json({ message: 'product added succefully created successfully', user });
+  }
 
+  catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  } 
+});
 app.set('trust proxy', 1);
 
 // Middleware
@@ -29,18 +44,18 @@ app.use((req, res, next) => {
   next();
 });
 
-console.log('Initializing passport and session...');
-app.use(passport.initialize());
+// console.log('Initializing passport and session...');
+// app.use(passport.initialize());
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev_secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'None'
-  }
-}));
+// app.use(session({
+//   secret: process.env.SESSION_SECRET || 'dev_secret',
+//   resave: false,
+//   saveUninitialized: false,
+//   cookie: {
+//     secure: process.env.NODE_ENV === 'production',
+//     sameSite: 'None'
+//   }
+// }));
 
 const mountPaths = {
   auth: '/auth',
@@ -48,20 +63,20 @@ const mountPaths = {
   products: '/products'
 };
 
-Object.entries({
-  [mountPaths.auth]: authRoutes,
-  [mountPaths.cart]: cartRoutes,
-  [mountPaths.products]: productRoutes
-}).forEach(([path, router]) => {
-  console.log(`Mounting routes at ${path}`);
-  app.use(path, (req, res, next) => {
-    console.log(`Processing ${req.method} request to ${path}${req.url}`);
-    router(req, res, next);
-  });
-});
+// Object.entries({
+//   [mountPaths.auth]: authRoutes,
+//   [mountPaths.cart]: cartRoutes,
+//   [mountPaths.products]: productRoutes
+// }).forEach(([path, router]) => {
+//   console.log(`Mounting routes at ${path}`);
+//   app.use(path, (req, res, next) => {
+//     console.log(`Processing ${req.method} request to ${path}${req.url}`);
+//     router(req, res, next);
+//   });
+// });
 
-console.log('All routes registered successfully');
-app.use('/cart', cartRoutes);
+// console.log('All routes registered successfully');
+// app.use('/cart', cartRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
@@ -74,6 +89,7 @@ app.use((err, req, res, next) => {
     error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });
+
 
 const PORT = process.env.PORT || 4000;
 const startServer = async () => {

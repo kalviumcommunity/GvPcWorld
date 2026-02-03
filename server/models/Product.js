@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -82,33 +82,6 @@ productSchema.index({ name: 'text', description: 'text' });
 productSchema.index({ category: 1, brand: 1 });
 productSchema.index({ price: 1 });
 
-// Virtual for average rating calculation
-productSchema.virtual('averageRating').get(function() {
-  if (this.reviews.length === 0) return 0;
-  const sum = this.reviews.reduce((total, review) => total + review.rating, 0);
-  return (sum / this.reviews.length).toFixed(1);
-});
+const Product = mongoose.model('Product', productSchema);
 
-// Pre-save middleware to update rating
-productSchema.pre('save', function(next) {
-  if (this.reviews.length > 0) {
-    const sum = this.reviews.reduce((total, review) => total + review.rating, 0);
-    this.rating = (sum / this.reviews.length).toFixed(1);
-  }
-  next();
-});
-
-// Instance method to check stock availability
-productSchema.methods.isInStock = function(quantity = 1) {
-  return this.stock >= quantity;
-};
-
-// Static method to find compatible products
-productSchema.statics.findCompatibleProducts = function(categoryFilter, compatibilityKey) {
-  return this.find({
-    category: categoryFilter,
-    compatibleWith: { $in: [compatibilityKey] }
-  });
-};
-
-module.exports = mongoose.model('Product', productSchema);
+export default Product;

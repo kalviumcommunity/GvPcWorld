@@ -1,29 +1,24 @@
-const mongoose = require('mongoose');
-
+import mongoose from 'mongoose';
 const cartItemSchema = new mongoose.Schema({
-  type: {
-    type: String,
-    enum: ['customBuild', 'prebuilt'],
-    required: true,
-  },
-  buildName: {
-    type: String,
-    required: true,
-  },
-  components: {
-    type: Object,
-  },
-  totalPrice: {
-    type: Number,
+  productId: { // we can reference to box user has choosen in cart
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
     required: true,
   },
   quantity: {
     type: Number,
     required: true,
     min: 1,
-    default: 1,
   },
-}, { _id: false });
+  price: {
+    type: Number,
+    required: true,
+  },
+  isCustomBuild: { type: Boolean, default: false },
+  selectedComponents: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Product' } // Array of IDs (CPU, GPU, etc.)
+  ]
+});
 
 const cartSchema = new mongoose.Schema({
   userId: {
@@ -43,4 +38,7 @@ cartSchema.pre('save', function(next) {
   next();
 });
 
-module.exports = mongoose.model('Cart', cartSchema);
+const Cart = mongoose.model('Cart', cartSchema);
+const Item = mongoose.model('CartItem', cartItemSchema);
+
+export { Cart, Item };

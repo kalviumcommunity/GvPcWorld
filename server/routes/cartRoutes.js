@@ -20,6 +20,7 @@ router.post('/add', (req, res, next) => {
   addToCart(req, res, next);
 });
 
+
 router.put('/update', (req, res, next) => {
   console.log('Processing update cart request', { body: req.body });
   updateCartItem(req, res, next);
