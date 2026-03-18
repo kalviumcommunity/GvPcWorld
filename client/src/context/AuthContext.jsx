@@ -10,12 +10,20 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check if user is authenticated on component mount and when auth state changes
   useEffect(() => {
     const fetchUser = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const res = await axios.get(`${API_URL}/auth/success`, {
           withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         });
         
         if (res.data && res.data.user) {
@@ -31,15 +39,14 @@ export const AuthProvider = ({ children }) => {
         } else {
           setUser(null);
           setIsAuthenticated(false);
-          // Don't set error for normal unauthenticated state
           setError(null);
+          localStorage.removeItem('token');
         }
       } catch (err) {
-        console.error('Auth check failed:', err);
         setUser(null);
         setIsAuthenticated(false);
-        // Don't set error for normal authentication failures
         setError(null);
+        localStorage.removeItem('token');
       } finally {
         setLoading(false);
       }
@@ -47,7 +54,6 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  // Check for login success callback
   useEffect(() => {
     const checkLoginSuccess = async () => {
       if (window.location.pathname === '/auth/google/callback') {
@@ -75,7 +81,6 @@ export const AuthProvider = ({ children }) => {
             window.location.href = '/login';
           }
         } catch (err) {
-          console.error('Login callback failed:', err);
           setUser(null);
           setIsAuthenticated(false);
           setError('Login failed. Please try again.');
@@ -89,22 +94,17 @@ export const AuthProvider = ({ children }) => {
     checkLoginSuccess();
   }, []);
 
-  // Google OAuth login
   const handleGoogleLogin = () => {
     window.location.href = `${API_URL}/auth/google`;
   };
 
-  // Logout function
   const logout = async () => {
     try {
-      await axios.post(`${API_URL}/auth/logout`, {}, {
-        withCredentials: true,
-      });
+      localStorage.removeItem('token');
       setUser(null);
       setIsAuthenticated(false);
       window.location.href = '/';
     } catch (err) {
-      console.error('Logout failed:', err);
       setError('Logout failed. Please try again.');
     }
   };
@@ -125,7 +125,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

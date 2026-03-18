@@ -33,12 +33,15 @@ const ComponentCard = ({ type, component, onRemove }) => {
                 component="img"
                 src={component.image}
                 alt={component.component}
+                onError={(e) => {
+                  e.target.src = '/processor.png';
+                }}
                 sx={{
                   width: 48,
                   height: 48,
                   borderRadius: 2,
                   mr: 2,
-                  objectFit: 'cover',
+                  objectFit: 'contain',
                   boxShadow: '0 1px 6px 0 rgba(0,0,0,0.10)',
                   background: '#f5f5f5',
                 }}

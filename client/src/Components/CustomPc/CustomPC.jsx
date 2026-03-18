@@ -25,7 +25,7 @@ const CustomPC = () => {
   }, []);
 
  const handleAddToCart = async () => {
-    if (!user || !user._id) {
+    if (!user || !user.id) {
       toast.error("Please log in to add to cart.");
       return;
     }
@@ -34,7 +34,6 @@ const CustomPC = () => {
       const totalPrice = calculateTotalPrice(selectedComponents);
       const buildName = currentBuildName || "My Custom PC";
       await API.post('/cart/add', {
-        userId: user._id,
         type: 'customBuild',
         buildName,
         components: selectedComponents,
@@ -45,19 +44,19 @@ const CustomPC = () => {
       setSelectedComponents({});
       setCurrentBuildName("My Custom PC");
     } catch (error) {
-      toast.error('Failed to add to cart');
+      console.error('Add to cart error:', error.response?.data || error.message);
+      toast.error(error.response?.data?.message || 'Failed to add to cart');
     }
   };
 
   const handleAddPrebuiltToCart = async (prebuilt) => {
-    if (!user || !user._id) {
+    if (!user || !user.id) {
       toast.error("Please log in to add to cart.");
       return;
     }
 
     try {
       await API.post('/cart/add', {
-        userId: user._id,
         type: 'prebuilt',
         buildName: prebuilt.name,
         components: prebuilt.components,
@@ -66,7 +65,8 @@ const CustomPC = () => {
       });
       toast.success('Pre-built PC added to cart!');
     } catch (error) {
-      toast.error('Failed to add pre-built PC');
+      console.error('Add prebuilt to cart error:', error.response?.data || error.message);
+      toast.error(error.response?.data?.message || 'Failed to add pre-built PC');
     }
   };
 

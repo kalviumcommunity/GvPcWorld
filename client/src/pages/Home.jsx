@@ -487,66 +487,7 @@ const Home = () => {
         </Container>
       </Box>
 
-      {/* Featured Products Section - Card Grid */}
-      <Container sx={{ py: 8 }}>
-        <Typography 
-          variant="h3" 
-          align="center" 
-          sx={{ 
-            mb: 6,
-            fontWeight: 700,
-            background: 'linear-gradient(45deg, #64b5f6, #2196f3)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}
-        >
-          Featured Products
-        </Typography>
-        <Suspense fallback={<Box sx={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</Box>}>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr',
-                sm: 'repeat(2, 1fr)',
-                md: 'repeat(3, 1fr)'
-              },
-              gap: 4
-            }}
-          >
-            <Fade in timeout={600}>
-              <Box>
-                <ProductCard
-                  title="Gaming PC"
-                  description="High-performance gaming rigs"
-                  image="/images/products/gaming-pc.jpg"
-                  price={1499}
-                />
-              </Box>
-            </Fade>
-            <Fade in timeout={600} style={{ transitionDelay: '200ms' }}>
-              <Box>
-                <ProductCard
-                  title="Workstation"
-                  description="Professional workstations"
-                  image="/images/products/workstation.jpg"
-                  price={1999}
-                />
-              </Box>
-            </Fade>
-            <Fade in timeout={600} style={{ transitionDelay: '400ms' }}>
-              <Box>
-                <ProductCard
-                  title="Custom Build"
-                  description="Build your dream PC"
-                  image="/images/products/custom-pc.jpg"
-                  price={1299}
-                />
-              </Box>
-            </Fade>
-          </Box>
-        </Suspense>
-      </Container>
+
 
       {/* Categories Section - Modern Grid */}
       <Box 
@@ -557,35 +498,8 @@ const Home = () => {
           background: 'linear-gradient(135deg, rgba(25,118,210,0.1) 0%, rgba(13,71,161,0.2) 100%)'
         }}
       >
-        <Container maxWidth="lg">
-          <Typography 
-            variant="h3" 
-            align="center" 
-            sx={{ 
-              mb: 6,
-              fontWeight: 700,
-              background: 'linear-gradient(45deg, #64b5f6, #2196f3)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
-          >
-            Featured Categories
-          </Typography>
-          <Grid container spacing={3}>
-            {categories.map((category, index) => (
-              <Grid item xs={12} sm={6} md={4} key={category.id}>
-                <CategoryCard 
-                  category={category} 
-                  index={index} 
-                  onNavigate={navigate}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
 
-      {/* Testimonials Section - Modern Cards */}
+      </Box>
       <Box 
         ref={testimonialsRef}
         className="testimonials-section"
@@ -604,31 +518,7 @@ const Home = () => {
           }
         }}
       >
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Typography 
-            variant="h3" 
-            align="center" 
-            sx={{ 
-              mb: 6,
-              fontWeight: 700,
-              background: 'linear-gradient(45deg, #64b5f6, #2196f3)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
-          >
-            What Our Customers Say
-          </Typography>
-          <Grid container spacing={4}>
-            {testimonials.map((testimonial, index) => (
-              <Grid item xs={12} md={4} key={testimonial.id}>
-                <TestimonialCard 
-                  testimonial={testimonial} 
-                  index={index}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
+
       </Box>
 
       {/* CTA Section - Modern and Engaging */}
@@ -653,58 +543,7 @@ const Home = () => {
           }
         }}
       >
-        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-          <Fade in timeout={800}>
-            <Box>
-              <Typography 
-                variant="h2" 
-                sx={{ 
-                  fontWeight: 800,
-                  mb: 3,
-                  textShadow: '0 2px 10px rgba(0,0,0,0.2)'
-                }}
-              >
-                Ready to Build Your Dream PC?
-              </Typography>
-              <Typography 
-                variant="h5" 
-                sx={{ 
-                  mb: 5,
-                  opacity: 0.9,
-                  maxWidth: '800px',
-                  margin: '0 auto',
-                  lineHeight: 1.6
-                }}
-              >
-                Start your custom PC build today and get expert guidance every step of the way.
-              </Typography>
-              <Button 
-                variant="contained" 
-                size="large"
-                onClick={handleStartBuilding}
-                sx={{ 
-                  py: 2,
-                  px: 6,
-                  borderRadius: 3,
-                  bgcolor: 'white',
-                  color: 'primary.main',
-                  fontSize: '1.2rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.1)',
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.9)',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 6px 25px 0 rgba(0,0,0,0.15)'
-                  },
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                Start Building Now
-              </Button>
-            </Box>
-          </Fade>
-        </Container>
+        
       </Box>
     </Box>
   );

@@ -3,11 +3,11 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';  
 import connectDB from './config/db.js';
-import User from './models/User.js';
-import {Cart, Item} from './models/Cart.js';
 import authroutes from './routes/auth.js';
 import requestContext from './middleware/requestContext.js';
 import errorHandler from './middleware/errorHandler.js';
+import productRoutes from './routes/product.js';
+import cartRoutes from './routes/cart.js';
 // we are going on a new journey and this is important to do.
 
 dotenv.config();
@@ -16,29 +16,11 @@ app.use(express.json());
 app.use(requestContext); 
 connectDB();
 app.use('/auth', authroutes);
-app.post('/test', async (req, res) => {
-  try {
-   const { productId, quantity, price, isCustomBuild, selectedComponents } = req.body;
-
-  const item = await Item.create({
-    productId,
-    quantity,
-    price,
-    isCustomBuild,
-    selectedComponents
-  });
-    res.status(201).json({ message: 'product added succefully created successfully', item });
-  }
-
-  catch (error) {
-    console.error('Error creating item:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  } 
-});
-app.set('trust proxy', 1);
+app.use('/products', productRoutes);
+app.use('/cart', cartRoutes);
 
 
-app.use(express.json());
+
 app.use(cookieParser());
 app.use(cors({ 
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
@@ -52,19 +34,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
-
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
-
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    message: 'Something broke!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
 
 app.use(errorHandler)
 const PORT = process.env.PORT || 4000;

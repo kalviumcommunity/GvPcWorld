@@ -3,7 +3,7 @@ import Cart from '../models/Cart.js';
 import makeCartRepository from '../data-access/cartRepository.js';
 import makeCartService from '../services/cartService.js';
 import makeCartController from '../controllers/cartController.js';
-import isAuth from '../middlewares/isAuth.js'; 
+import isAuth from '../middleware/isAuth.js'; 
 
 const router = express.Router();
 

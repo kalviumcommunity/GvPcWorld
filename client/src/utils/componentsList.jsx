@@ -1,49 +1,49 @@
 export const componentsList = {
     BoxCase: {
-      "Standard Box": { price: 2000, image: "../../assests/images/boxcase.png" },
-      "RGB Box": { price: 5000, image: "C:\Users\vaish\OneDrive\Desktop\Projects\GvPcWorld-mern\client\src\assets\images\boxcase.png" },
-      "Full Tower Box": { price: 8000, image: "../../assets/images/boxcase.png" },
+      "Standard Box": { price: 2000, image: "/boxcase.png" },
+      "RGB Box": { price: 5000, image: "/boxcase.png" },
+      "Full Tower Box": { price: 8000, image: "/boxcase.png" },
     },
     Motherboard: {
-      "ASUS ROG Strix": { price: 30000, image: "/images/motherboard.png" },
-      "MSI B450": { price: 15000, image: "/images/motherboard.png" },
-      "Gigabyte Aorus": { price: 25000, image: "/images/motherboard.png" },
+      "ASUS ROG Strix": { price: 30000, image: "/motherboard.png" },
+      "MSI B450": { price: 15000, image: "/motherboard.png" },
+      "Gigabyte Aorus": { price: 25000, image: "/motherboard.png" },
     },
     Processor: {
-      "Intel i9": { price: 50000, image: "/images/processor.png" },
-      "AMD Ryzen 9": { price: 45000, image: "/images/processor.png" },
+      "Intel i9": { price: 50000, image: "/processor.png" },
+      "AMD Ryzen 9": { price: 45000, image: "/processor.png" },
     },
     RAM: {
-      "16GB DDR4": { price: 7000, image: "/images/ram.png" },
-      "32GB DDR4": { price: 12000, image: "/images/ram.png" },
+      "16GB DDR4": { price: 7000, image: "/ram.png" },
+      "32GB DDR4": { price: 12000, image: "/ram.png" },
     },
     Monitor: {
-      "24-inch Monitor": { price: 20000, image: "/images/monitor.png" },
-      "27-inch Monitor": { price: 25000, image: "/images/monitor.png" },
+      "24-inch Monitor": { price: 20000, image: "/monitor.png" },
+      "27-inch Monitor": { price: 25000, image: "/monitor.png" },
     },
     GPU: {
-      "NVIDIA RTX 3080": { price: 80000, image: "/images/gpu.png" },
-      "AMD Radeon RX 6800": { price: 70000, image: "/images/gpu.png" },
+      "NVIDIA RTX 3080": { price: 80000, image: "/gpu.png" },
+      "AMD Radeon RX 6800": { price: 70000, image: "/gpu.png" },
     },
     Storage: {
-      "1TB SSD": { price: 10000, image: "/images/storage.png" },
-      "2TB HDD": { price: 8000, image: "/images/storage.png" },
+      "1TB SSD": { price: 10000, image: "/storage.png" },
+      "2TB HDD": { price: 8000, image: "/storage.png" },
     },
     PowerSupply: {
-      "750W PSU": { price: 10000, image: "/images/powersupply.png" },
-      "850W PSU": { price: 12000, image: "/images/powersupply.png" },
+      "750W PSU": { price: 10000, image: "/powersupply.png" },
+      "850W PSU": { price: 12000, image: "/powersupply.png" },
     },
     Cooling: {
-      "Air Cooler": { price: 5000, image: "/images/coolant.png" },
-      "Liquid Cooler": { price: 10000, image: "/images/coolant.png" },
+      "Air Cooler": { price: 5000, image: "/coolant.png" },
+      "Liquid Cooler": { price: 10000, image: "/coolant.png" },
     },
     Mouse: {
-      "Logitech MX Master": { price: 10000, image: "/images/mouse.png" },
-      "Razer DeathAdder": { price: 8000, image: "/images/mouse.png" },
+      "Logitech MX Master": { price: 10000, image: "/mouse.png" },
+      "Razer DeathAdder": { price: 8000, image: "/mouse.png" },
     },
     Keyboard: {
-      "Mechanical Keyboard": { price: 15000, image: "/images/keyboard.png" },
-      "Membrane Keyboard": { price: 6000, image: "../" },
+      "Mechanical Keyboard": { price: 15000, image: "/keyboard.png" },
+      "Membrane Keyboard": { price: 6000, image: "/keyboard.png" },
     },
   };
   

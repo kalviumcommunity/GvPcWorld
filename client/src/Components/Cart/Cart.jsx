@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import API from '../../Api/api';
 import { 
   Container, 
@@ -47,6 +47,7 @@ const Cart = () => {
       setCart(res.data);
       setError(null);
     } catch (err) {
+      console.error('Cart fetch error:', err);
       setError('Failed to fetch cart. Please try again later.');
     } finally {
       setLoading(false);
@@ -72,6 +73,7 @@ const Cart = () => {
       toast.success("Cart cleared successfully");
       setClearCartDialog(false);
     } catch (error) {
+      console.error('Clear cart error:', error);
       toast.error("Failed to clear cart");
     }
   };
@@ -101,15 +103,13 @@ const Cart = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 4 } }}>
-      <Paper 
-        elevation={3} 
-        sx={{ 
+      <Paper elevation={3} sx={{ 
           bgcolor: 'background.paper', 
           p: { xs: 2, sm: 3, md: 4 }, 
           borderRadius: 2,
           overflow: 'hidden'
-        }}
-      >
+        }}>
+      
         <Box sx={{ 
           display: 'flex', 
           flexDirection: { xs: 'column', sm: 'row' },
@@ -148,16 +148,18 @@ const Cart = () => {
 
         {loading ? (
           <Typography variant="body1" sx={{ py: 4 }}>Loading your cart...</Typography>
-        ) : items.length > 0 ? (
-          <Fade in>
-            <Box>
-              <Typography variant="h6" fontWeight={600} mb={2}>
-                Items in Cart: {items.length}
-              </Typography>
+        ) : (
+          <>
+            {items.length > 0 ? (
+              <Fade in>
+                <Box>
+                  <Typography variant="h6" fontWeight={600} mb={2}>
+                    Items in Cart: {items.length}
+                  </Typography>
 
-              <Box sx={{ mb: 3 }}>
-                {items.map((item, index) => (
-                  <Paper key={index} elevation={2} sx={{ p: 2, mb: 2 }}>
+                  <Box sx={{ mb: 3 }}>
+                    {items.map((item) => (
+                      <Paper key={item._id} elevation={2} sx={{ p: 2, mb: 2 }}>
                     <Typography variant="subtitle1" fontWeight={600}>
                       {item.buildName}
                     </Typography>
@@ -178,45 +180,47 @@ const Cart = () => {
                 Total: ₹{totalAmount.toLocaleString()}
               </Typography>
 
-              <Button 
-                variant="contained"
-                color="primary"
-                size="large"
-                fullWidth
-                onClick={handleCheckout}
-                sx={{ borderRadius: 2 }}
-              >
-                Proceed to Checkout
-              </Button>
+          <Button 
+            variant="contained"
+            color="primary"
+            size="large"
+            fullWidth
+            onClick={handleCheckout}
+            sx={{ borderRadius: 2 }}
+          >
+            Proceed to Checkout
+          </Button>
             </Box>
           </Fade>
-        ) : (
-          <Fade in>
-            <Box sx={{ textAlign: 'center', py: 6 }}>
-              <ShoppingCartIcon sx={{ fontSize: 60, color: 'primary.light', mb: 2 }} />
-              <Typography variant="h5" fontWeight={600} gutterBottom>
-                Your cart is empty
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                Start building your custom PC or browse our components.
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexDirection: isMobile ? 'column' : 'row' }}>
-                <Button 
-                  variant="contained"
-                  onClick={() => navigate('/custom-pc')}
-                  startIcon={<BuildIcon />}
-                >
-                  Build Your PC
-                </Button>
-                <Button 
-                  variant="outlined"
-                  onClick={() => navigate('/products')}
-                >
-                  Browse Components
-                </Button>
-              </Box>
-            </Box>
-          </Fade>
+            ) : (
+              <Fade in>
+                <Box sx={{ textAlign: 'center', py: 6 }}>
+                  <ShoppingCartIcon sx={{ fontSize: 60, color: 'primary.light', mb: 2 }} />
+                  <Typography variant="h5" fontWeight={600} gutterBottom>
+                    Your cart is empty
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                    Start building your custom PC or browse our components.
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexDirection: isMobile ? 'column' : 'row' }}>
+                    <Button 
+                      variant="contained"
+                      onClick={() => navigate('/custom-pc')}
+                      startIcon={<BuildIcon />}
+                    >
+                      Build Your PC
+                    </Button>
+                    <Button 
+                      variant="outlined"
+                      onClick={() => navigate('/products')}
+                    >
+                      Browse Components
+                    </Button>
+                  </Box>
+                </Box>
+              </Fade>
+            )}
+          </>
         )}
       </Paper>
 
